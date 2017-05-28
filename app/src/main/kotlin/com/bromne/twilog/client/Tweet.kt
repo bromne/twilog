@@ -1,0 +1,42 @@
+package com.bromne.twilog.client
+
+import org.joda.time.LocalDateTime
+import java.text.MessageFormat
+import java.util.regex.Pattern
+
+data class Tweet(val status: String, val user: User, val created: LocalDateTime, val message: String) {
+    val id :Long = this.status.extractWithPattern(Tweet.idPattern)
+            .let { java.lang.Long.parseLong(it) }
+    override fun toString(): String = MessageFormat.format("[{0} {1}] {2}", this.created.toString("yyyy-MM-dd HH:mm:ss"), this.user.name, this.message)
+
+    companion object {
+        val idPattern = Pattern.compile("https://twitter.com/.+/status/(\\d+)")!!
+    }
+}
+
+data class User(val name: String, val display: String, val image: UserImage)
+
+data class UserImage(val base: String, val extension: String) {
+    val original = this.base + this.extension
+    val bigger = this.base + "_bigger" + this.extension
+    val normal = this.base + "_normal" + this.extension
+    val mini = this.base + "_mini" + this.extension
+
+    companion object {
+        val PATTERN = Pattern.compile("(.+)_normal(\\..+)")
+
+        fun fromNormal(url: String): UserImage {
+            val match = PATTERN.matcher(url)
+            if (match.find()) {
+                val base = match.group(1)
+                val extension = match.group(2)
+                return UserImage(base, extension)
+            } else {
+                throw IllegalArgumentException()
+            }
+        }
+    }
+
+}
+
+data class Result(val tweets: List<Tweet>)

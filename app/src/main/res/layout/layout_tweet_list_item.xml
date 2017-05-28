@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/tools"
+    android:id="@+id/layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/cardView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:layout_marginBottom="@dimen/margin_card_half"
+        android:layout_marginLeft="@dimen/margin_card_half"
+        android:layout_marginRight="@dimen/margin_card_half"
+        android:layout_marginTop="@dimen/margin_card_half"
+
+        app:cardUseCompatPadding="true"
+        app:cardCornerRadius="0dp">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="@dimen/margin_icon">
+
+            <ImageView
+                android:layout_width="@dimen/icon_side_length"
+                android:layout_height="@dimen/icon_side_length"
+                android:id="@+id/icon"
+                android:adjustViewBounds="true"
+                app:src="@drawable/designer_icon"
+                android:contentDescription="@string/portrait"
+                android:layout_marginEnd="@dimen/margin_icon"
+                android:scaleType="fitStart" />
+
+            <TextView
+                android:id="@+id/displayName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                app:text="Jane Doe"
+                android:layout_toEndOf="@id/icon"
+                android:textColor="@android:color/primary_text_light"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/userName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/margin_icon"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                app:text="\@user"
+                android:layout_toEndOf="@id/displayName"
+                android:layout_alignBaseline="@id/displayName"
+                />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                app:text="あのイーハトーヴォのすきとおった風、夏でも底に冷たさをもつ青いそら、うつくしい森で飾られたモリーオ市、郊外のぎらぎらひかる草の波。"
+                android:id="@+id/message"
+                android:layout_below="@id/displayName"
+                android:layout_toEndOf="@id/icon"
+                android:layout_alignParentStart="false"
+                android:textColor="@android:color/primary_text_light" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                app:text="2017/05/01 12:34:56"
+                android:id="@+id/created"
+                android:layout_below="@id/message"
+                android:layout_toEndOf="@id/icon" />
+        </RelativeLayout>
+
+    </android.support.v7.widget.CardView>
+</LinearLayout>
