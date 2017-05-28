@@ -5,6 +5,23 @@
     <dimen name="text_margin">16dp</dimen>
     <dimen name="margin_icon">8dp</dimen>
     <dimen name="margin_card_half">4dp</dimen>
+
+    <dimen name="margin_huge">64dp</dimen>
+
     <dimen name="icon_side_length">48dp</dimen>
     <dimen name="icon_side_length_mini">24dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="appbar_padding_top">8dp</dimen>
+
+    <dimen name="elevation_switch">1dp</dimen>
+    <dimen name="elevation_button">2dp</dimen>
+    <dimen name="elevation_refresh_indicator">3dp</dimen>
+    <dimen name="elevation_app_bar">4dp</dimen>
+    <dimen name="elevation_fab">6dp</dimen>
+    <dimen name="elevation_menu">8dp</dimen>
+    <dimen name="elevation_menu_sub">9dp</dimen>
+    <dimen name="elevation_fab_pressed">12dp</dimen>
+    <dimen name="elevation_drawer">16dp</dimen>
+    <dimen name="elevation_dialog">24dp</dimen>
+    <dimen name="font_size_huge">32sp</dimen>
 </resources>

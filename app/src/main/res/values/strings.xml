@@ -1,7 +1,17 @@
 <resources>
     <string name="app_name">Twilog</string>
-    <string name="portrait">portrait</string>
-    <string name="no_items">なにもありません</string>
+    <string name="title_activity_home">HomeActivity</string>
 
-    <string name="font_fontawesome">fonts/fontawesome.ttf</string>
+    <string name="icon">icon</string>
+    <string name="recent">Recent</string>
+
+    <string name="move">move</string>
+
+    <string name="find_user">Find User</string>
+    <string name="no_items">no items</string>
+
+    <string name="date_format_with_day">dddd, MMMM dd yyyy</string>
+
+    <string name="font_federation" translatable="false">fonts/federation.ttf</string>
+    <string name="font_fontawesome" translatable="false">fonts/fontawesome.ttf</string>
 </resources>

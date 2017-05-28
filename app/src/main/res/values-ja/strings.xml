@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Twilog</string>
+    <string name="icon">アイコン</string>
+    <string name="move">移動</string>
+    <string name="no_items">なにもありません</string>
+    <string name="date_format_with_day">yyyy年MM月dd日（dddd）</string>
+    <string name="recent">最近</string>
+    <string name="find_user">ユーザーを見つける</string>
+</resources>

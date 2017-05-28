@@ -1,7 +1,7 @@
 package com.bromne.async
 
 import android.os.AsyncTask
-import fj.data.Either
+import com.bromne.data.Either
 
 class RegularAsyncTask<T>(val callbacks: Callbacks<T>) : AsyncTask<Void, Int, Either<Exception, T>>() {
     override fun doInBackground(vararg params: Void?): Either<Exception, T> {
@@ -26,11 +26,18 @@ class RegularAsyncTask<T>(val callbacks: Callbacks<T>) : AsyncTask<Void, Int, Ei
     }
 
     override fun onPostExecute(result: Either<Exception, T>): Unit {
-        if (result.isRight) {
-            this.callbacks.onLoadFinished(result.right().value())
-        } else {
-            this.callbacks.onException(result.left().value())
+        when (result) {
+            is Either.Right -> this.callbacks.onLoadFinished(result.value)
+            is Either.Left -> this.callbacks.onException(result.value)
         }
+
+        result.map({ this.callbacks.onException(it) }, { this.callbacks.onLoadFinished(it) })
+
+//        if (result.isRight) {
+//            this.callbacks.onLoadFinished(result.right().value())
+//        } else {
+//            this.callbacks.onException(result.left().value())
+//        }
     }
 
     companion object {

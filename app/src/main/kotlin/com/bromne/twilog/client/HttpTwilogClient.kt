@@ -11,10 +11,33 @@ import java.net.URL
 import java.util.ArrayDeque
 import java.util.regex.Pattern
 import com.bromne.twilog.client.TwilogClient.Joint
+import com.bromne.twilog.client.TwilogClient.Order
+import org.jsoup.nodes.Document
 
 class HttpTwilogClient : TwilogClient {
 
     internal val iconCache: MutableMap<String, Bitmap> = mutableMapOf()
+
+    override fun find(query: TwilogClient.Query): Result {
+        val base = "http://twilog.org/${query.userName}"
+        val request = query.body.map({
+            val date = it?.let { "/date-" + it.toString("yy-MM-dd") }
+            val order = if (query.order == Order.ASC) "/allasc" else ""
+            (date ?: "") + order
+        }, {
+            val order = if (query.order == Order.ASC) "order=allasc" else null
+
+            // TODO: 検索文字列のサニタイズ
+            val queryString = listOf("word=" + it.keyword, "ao=" + it.joint, order)
+                    .excludeNullable()
+                    .joinToString("&")
+
+            "/search?" + queryString
+        })
+
+        val url = base + request
+        return extractResultByUrl(url)
+    }
 
     override fun findRecent(userName: String): Result {
         throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
@@ -26,7 +49,7 @@ class HttpTwilogClient : TwilogClient {
 
     override fun search(userName: String, query: String, joint: Joint): Result {
         val url = "http://twilog.org/$userName/search?word=$query&ao=$joint"
-        return Result(extractTweetsByUrl(url))
+        return extractResultByUrl(url)
     }
 
     override fun loadUserIcon(user: User): Bitmap {
@@ -40,10 +63,20 @@ class HttpTwilogClient : TwilogClient {
         }
     }
 
-    fun extractTweetsByUrl(url: String): List<Tweet> {
+    fun extractResultByUrl(url: String): Result {
         val timeFormat = Pattern.compile("(\\d{2}:\\d{2}:\\d{2})")
         val nameFormat = Pattern.compile("@(.+)")
         val dateTimeFormat = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
+
+        fun tweeterFromElement(root: Element): User {
+            val name = root.select("#user-info-content h1 span").text()
+                    .extractWithPattern(nameFormat)
+            val displayName = root.select("#user-info-content h1 strong").text()
+            val image = root.select("#user-info-icon img")
+                    .attr("src")
+                    .let { UserImage.fromBigger(it) }
+            return User(name ?: "", displayName, image)
+        }
 
         fun extractGroup(elements: Elements): List<Pair<LocalDate, List<Element>>> {
             val datePattern = Pattern.compile("(\\d{4}年\\d{2}月\\d{2}日)")
@@ -93,6 +126,8 @@ class HttpTwilogClient : TwilogClient {
         val ua = System.getProperty("http.agent")
         val document = Jsoup.connect(url).header("User-Agent", ua).get()
 
+        val tweeter = tweeterFromElement(document)
+
         val tweetElements = document.select("#content")
                 .select("h3.title01,section.tl-tweets article.tl-tweet")
 
@@ -116,10 +151,7 @@ class HttpTwilogClient : TwilogClient {
                 .flatMap { it.toList() }
                 .excludeNullable()
                 .toList()
-        return tweets
-    }
 
-    companion object {
-        val special: String = "http://pbs.twimg.com/profile_images/867962286823964678/zI3K6gV7_normal.jpg"
+        return Result(tweeter, tweets)
     }
 }

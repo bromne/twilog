@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:name="com.bromne.twilog.TweetFragment"
-    tools:context=".MainActivity"
+    android:name="com.bromne.twilog.activity.TweetFragment"
+    tools:context=".activity.MainActivity"
     tools:layout="@layout/fragment_tweet_list"
     android:id="@+id/fragment" />

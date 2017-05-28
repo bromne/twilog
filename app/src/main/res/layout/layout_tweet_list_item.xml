@@ -29,7 +29,7 @@
                 android:id="@+id/icon"
                 android:adjustViewBounds="true"
                 app:src="@drawable/designer_icon"
-                android:contentDescription="@string/portrait"
+                android:contentDescription="@string/icon"
                 android:layout_marginEnd="@dimen/margin_icon"
                 android:scaleType="fitStart" />
 

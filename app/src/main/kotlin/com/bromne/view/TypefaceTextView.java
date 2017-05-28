@@ -3,6 +3,7 @@ package com.bromne.view;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Typeface;
+import android.support.annotation.StringRes;
 import android.util.AttributeSet;
 import android.util.LruCache;
 import android.widget.TextView;
@@ -30,6 +31,12 @@ public class TypefaceTextView extends TextView {
             Typeface typeface = getTypeface(context, typefaceName);
             this.setTypeface(typeface);
         }
+    }
+
+    public void setTypeFace(@StringRes int resourceId) {
+        String name = getContext().getString(resourceId);
+        Typeface typeface = getTypeface(getContext(), name);
+        this.setTypeface(typeface);
     }
 
     public static Typeface getTypeface(Context context, String name) {

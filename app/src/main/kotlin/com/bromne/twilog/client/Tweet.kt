@@ -23,10 +23,14 @@ data class UserImage(val base: String, val extension: String) {
     val mini = this.base + "_mini" + this.extension
 
     companion object {
-        val PATTERN = Pattern.compile("(.+)_normal(\\..+)")
+        val PATTERN_NORMAL = Pattern.compile("(.+)_normal(\\..+)")!!
+        val PATTERN_BIGGER = Pattern.compile("(.+)_bigger(\\..+)")!!
 
-        fun fromNormal(url: String): UserImage {
-            val match = PATTERN.matcher(url)
+        fun fromNormal(url: String) = fromPattern(url, PATTERN_NORMAL)
+        fun fromBigger(url: String) = fromPattern(url, PATTERN_BIGGER)
+
+        internal fun fromPattern(url: String, pattern: Pattern): UserImage {
+            val match = pattern.matcher(url)
             if (match.find()) {
                 val base = match.group(1)
                 val extension = match.group(2)
@@ -39,4 +43,4 @@ data class UserImage(val base: String, val extension: String) {
 
 }
 
-data class Result(val tweets: List<Tweet>)
+data class Result(val user: User, val tweets: List<Tweet>)
