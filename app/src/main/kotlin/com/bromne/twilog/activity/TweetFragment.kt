@@ -25,6 +25,7 @@ import com.bromne.twilog.R
 import com.bromne.twilog.app.SavedQuery
 import com.bromne.twilog.app.favorites
 import com.bromne.twilog.app.history
+import com.bromne.twilog.app.sharedPreferences
 import com.bromne.twilog.client.Result
 import com.bromne.twilog.client.Tweet
 import com.bromne.twilog.client.TwilogClient
@@ -94,7 +95,7 @@ class TweetFragment : Fragment() {
     }
 
     internal fun onLoad(result: Result): Unit {
-        val pref = PreferenceManager.getDefaultSharedPreferences(this.context)
+        val pref = this.activity.sharedPreferences
         pref.history = pref.history.toBuilder()
                 .add(SavedQuery(this.mListener.query, DateTime.now()))
                 .build()
@@ -139,8 +140,7 @@ class TweetFragment : Fragment() {
         })
 
         mTweets.layoutManager = LinearLayoutManager(this.context)
-        val adapter = TweetAdapter(this.context, this, { result })
-        mTweets.adapter = adapter
+        mTweets.adapter = TweetAdapter(this.context, this, { result })
     }
 
     class TweetAdapter(val context: Context, val fragment: TweetFragment, val data: () -> Result) : RecyclerView.Adapter<TweetHolder>() {

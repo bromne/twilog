@@ -1,9 +1,12 @@
 <resources>
     <string name="app_name">Twilog</string>
-    <string name="title_activity_home">HomeActivity</string>
+    <string name="title_activity_home" translatable="false">HomeActivity</string>
 
     <string name="icon">icon</string>
+
     <string name="recent">Recent</string>
+    <string name="title_favorites">Favorites</string>
+    <string name="title_history">History</string>
 
     <string name="move">move</string>
 

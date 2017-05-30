@@ -1,22 +1,25 @@
 package com.bromne.twilog.activity
 
 import android.os.Bundle
-import android.support.design.widget.FloatingActionButton
-import android.support.design.widget.Snackbar
 import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
+import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
 import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.bromne.data.Either
 import com.bromne.twilog.R
+import com.bromne.twilog.app.SavedQuery
+import com.bromne.twilog.app.history
+import com.bromne.twilog.app.sharedPreferences
 import com.bromne.twilog.client.TwilogClient
 
-class HomeActivity : AppCompatActivity(), UserSearchFragment.Listener {
+class HomeActivity : AppCompatActivity(), UserSearchFragment.Listener, HistoryFragment.Listener {
     lateinit internal var mSectionsPagerAdapter: SectionsPagerAdapter
 
     lateinit internal var mViewPager: ViewPager
@@ -24,26 +27,47 @@ class HomeActivity : AppCompatActivity(), UserSearchFragment.Listener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
+        val toolbar = findViewById(R.id.toolbar) as Toolbar
+        setSupportActionBar(toolbar)
 
         mSectionsPagerAdapter = SectionsPagerAdapter(this)
 
         mViewPager = findViewById(R.id.container) as ViewPager
         mViewPager.adapter = mSectionsPagerAdapter
 
+        val onPageChange = object : ViewPager.OnPageChangeListener {
+            override fun onPageScrollStateChanged(state: Int) {
+            }
+
+            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+            }
+
+            override fun onPageSelected(position: Int) {
+                return when (position) {
+                    0 -> R.string.find_user
+                    1 -> R.string.title_favorites
+                    2 -> R.string.title_history
+                    else -> throw IllegalArgumentException()
+                }.let { this@HomeActivity.setTitle(it) }
+            }
+        }
+        mViewPager.addOnPageChangeListener(onPageChange)
+        onPageChange.onPageSelected(mViewPager.currentItem)
+
         val tabLayout = findViewById(R.id.tabs) as TabLayout
         tabLayout.setupWithViewPager(mViewPager)
-
     }
 
     override fun onMoveToUser(userName: String) {
         MainActivity.Companion.start(this, TwilogClient.Query(userName, Either.left(null), TwilogClient.Order.DESC))
     }
 
+    override fun findHistory(): List<SavedQuery> = this.sharedPreferences.history.toList()
+
     class PlaceholderFragment : Fragment() {
         override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                 savedInstanceState: Bundle?): View? {
             val rootView = inflater!!.inflate(R.layout.fragment_home, container, false)
-            val textView = rootView.findViewById(R.id.section_label) as TextView
             return rootView
         }
 
@@ -64,8 +88,8 @@ class HomeActivity : AppCompatActivity(), UserSearchFragment.Listener {
         override fun getItem(position: Int): Fragment {
             return when (position) {
                 0 -> UserSearchFragment.newInstance()
+                2 -> HistoryFragment.newInstance()
                 else -> PlaceholderFragment.newInstance(position + 1)
-                // else -> throw IllegalArgumentException()
             }
         }
 
@@ -73,11 +97,11 @@ class HomeActivity : AppCompatActivity(), UserSearchFragment.Listener {
 
         override fun getPageTitle(position: Int): CharSequence {
             return when (position) {
-                0 -> this.activity.getString(R.string.fontawesome_user)
-                1 -> this.activity.getString(R.string.fontawesome_star)
-                2 -> this.activity.getString(R.string.fontawesome_history)
+                0 -> R.string.fontawesome_user
+                1 -> R.string.fontawesome_star
+                2 -> R.string.fontawesome_history
                 else -> throw IllegalArgumentException()
-            }
+            }.let { this.activity.getString(it) }
         }
     }
 }

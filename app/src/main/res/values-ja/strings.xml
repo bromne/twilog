@@ -7,4 +7,6 @@
     <string name="date_format_with_day">yyyy年MM月dd日（dddd）</string>
     <string name="recent">最近</string>
     <string name="find_user">ユーザーを見つける</string>
+    <string name="title_favorites">お気に入り</string>
+    <string name="title_history">履歴</string>
 </resources>

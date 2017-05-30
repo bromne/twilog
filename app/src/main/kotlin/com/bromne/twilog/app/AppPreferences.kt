@@ -1,6 +1,8 @@
 package com.bromne.twilog.app
 
+import android.app.Activity
 import android.content.SharedPreferences
+import android.preference.PreferenceManager
 import com.bromne.io.getSerializable
 import com.bromne.io.putSerializable
 import com.bromne.io.update
@@ -11,6 +13,9 @@ import java.io.Serializable
 
 val FAVORITES = "favorites"
 val HISTORY = "history"
+
+val Activity.sharedPreferences : SharedPreferences
+    get() = PreferenceManager.getDefaultSharedPreferences(this)
 
 var SharedPreferences.favorites: ImmutableSet<SavedQuery>
     get() = this.getSerializable(FAVORITES) ?: ImmutableSet.of()
