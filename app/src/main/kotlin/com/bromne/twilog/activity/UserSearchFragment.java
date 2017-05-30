@@ -52,7 +52,6 @@ public class UserSearchFragment extends Fragment {
     }
 
     public interface Listener {
-        // TODO: Update argument type and name
         void onMoveToUser(String userName);
     }
 }

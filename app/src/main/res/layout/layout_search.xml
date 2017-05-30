@@ -3,56 +3,63 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    style="@style/AppBar"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="@dimen/margin_icon"
     android:id="@+id/lev"
     android:elevation="@dimen/margin_card_half"
-    tools:ignore="UnusedAttribute" >
+    tools:ignore="UnusedAttribute"
+    android:theme="@style/AppBar">
+    <!--style="@style/AppBar"-->
 
-    <ImageView
-        android:layout_width="@dimen/icon_side_length_mini"
-        android:layout_height="@dimen/icon_side_length_mini"
-        android:id="@+id/icon"
-        android:contentDescription="@string/icon"
-        tools:src="@drawable/designer_icon"
-        android:adjustViewBounds="true" />
 
-    <TextView
-        android:id="@+id/displayName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        tools:text="Jane Doe"
-        android:layout_toEndOf="@id/icon"
-        android:layout_marginLeft="@dimen/margin_icon"
-        android:textColor="@android:color/primary_text_dark"
-        android:textStyle="bold"
-        android:layout_alignBottom="@id/icon" />
+    <!--<ImageView-->
+        <!--android:layout_width="@dimen/icon_side_length_mini"-->
+        <!--android:layout_height="@dimen/icon_side_length_mini"-->
+        <!--android:id="@+id/icon"-->
+        <!--android:contentDescription="@string/icon"-->
+        <!--tools:src="@drawable/designer_icon"-->
+        <!--android:adjustViewBounds="true" />-->
 
-    <TextView
-        android:id="@+id/userName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:layout_marginLeft="@dimen/margin_icon"
-        tools:text="\@user"
-        android:textColor="@android:color/secondary_text_dark"
-        android:layout_toEndOf="@id/displayName"
-        android:layout_alignBaseline="@id/displayName" />
+    <!--<TextView-->
+        <!--android:id="@+id/displayName"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:textAppearance="?android:attr/textAppearanceMedium"-->
+        <!--tools:text="Jane Doe"-->
+        <!--android:layout_toEndOf="@id/icon"-->
+        <!--android:layout_marginLeft="@dimen/margin_icon"-->
+        <!--android:textStyle="bold"-->
+        <!--android:textColor="?android:attr/textColorPrimary"-->
+        <!--android:layout_alignBottom="@id/icon" />-->
+    <!--&lt;!&ndash;android:textColor="?attr/color"&ndash;&gt;-->
+
+    <!--<TextView-->
+        <!--android:id="@+id/userName"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:textAppearance="?android:attr/textAppearanceSmall"-->
+        <!--android:layout_marginLeft="@dimen/margin_icon"-->
+        <!--tools:text="\@user"-->
+        <!--android:textColor="@android:color/secondary_text_dark"-->
+        <!--android:layout_toEndOf="@id/displayName"-->
+        <!--android:layout_alignBaseline="@id/displayName" />-->
+
+    <include
+        android:id="@+id/user"
+        layout="@layout/layout_saved_query_user" />
 
     <com.bromne.view.TypefaceTextView
         android:id="@+id/function_icon"
         android:layout_width="@dimen/icon_side_length_mini"
         android:layout_height="@dimen/icon_side_length_mini"
-        android:layout_below="@id/icon"
+        android:layout_below="@id/user"
         android:layout_marginTop="@dimen/margin_card_half"
         tools:text="@string/fontawesome_calendar_check_o"
         android:textSize="@dimen/text_margin"
         app:typeface="@string/font_fontawesome"
-        android:textColor="@android:color/secondary_text_dark"
+        android:textColor="?android:textColorSecondary"
         android:layout_alignParentStart="false"
         tools:ignore="SpUsage"
         android:gravity="center" />
@@ -65,7 +72,7 @@
         tools:text="最近"
         android:layout_toEndOf="@id/function_icon"
         android:layout_marginLeft="@dimen/margin_icon"
-        android:textColor="@android:color/primary_text_dark"
+        android:textColor="?android:textColorPrimary"
         android:layout_alignBottom="@id/function_icon" />
 
 </RelativeLayout>
