@@ -19,13 +19,18 @@ import android.widget.TextView
 import android.widget.Toast
 import com.bromne.async.ParallelAsyncLoader
 import com.bromne.async.RegularAsyncTask
-import com.bromne.io.putSerializable
+import com.bromne.data.toBuilder
+import com.bromne.io.update
 import com.bromne.twilog.R
+import com.bromne.twilog.app.SavedQuery
+import com.bromne.twilog.app.favorites
+import com.bromne.twilog.app.history
 import com.bromne.twilog.client.Result
 import com.bromne.twilog.client.Tweet
 import com.bromne.twilog.client.TwilogClient
 import com.bromne.view.startAnimation
-import java.util.*
+import com.google.common.collect.ImmutableSet
+import org.joda.time.DateTime
 
 class TweetFragment : Fragment() {
     val imageLoader: ParallelAsyncLoader<String, Bitmap> = ParallelAsyncLoader()
@@ -51,9 +56,6 @@ class TweetFragment : Fragment() {
         mProgress = root.findViewById(R.id.progress) as ProgressBar
         mEmptyMessage = root.findViewById(R.id.no_items)
 
-//        val p = PreferenceManager.getDefaultSharedPreferences(this.activity)
-//        p.edit()
-//            .putSerializable()
         return root
     }
 
@@ -92,6 +94,11 @@ class TweetFragment : Fragment() {
     }
 
     internal fun onLoad(result: Result): Unit {
+        val pref = PreferenceManager.getDefaultSharedPreferences(this.context)
+        pref.history = pref.history.toBuilder()
+                .add(SavedQuery(this.mListener.query, DateTime.now()))
+                .build()
+
         val icon = mHeader.findViewById(R.id.icon) as ImageView
         val displayName = mHeader.findViewById(R.id.displayName) as TextView
         val userName = mHeader.findViewById(R.id.userName) as TextView
@@ -112,7 +119,6 @@ class TweetFragment : Fragment() {
                 icon.setImageResource(R.drawable.designer_icon)
                 icon.startAnimation(this@TweetFragment.context, R.anim.fade_in_medium)
             }
-
         })
         displayName.text = result.user.display
         userName.text = "@" + result.user.name

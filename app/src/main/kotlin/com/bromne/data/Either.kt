@@ -24,6 +24,29 @@ sealed class Either<L, R> : Serializable {
         fun <L, R> right(value: R): Either<L, R> = Right(value)
     }
 
-    class Left<L, R>(val value: L) : Either<L, R>()
-    class Right<L, R>(val value: R) : Either<L, R>()
+    class Left<L, R>(val value: L) : Either<L, R>() {
+        override fun equals(other: Any?): Boolean {
+            if (this === other)
+                return true
+            else
+                return (other is Left<*, *> ) && (value == other.value)
+        }
+
+        override fun hashCode(): Int {
+            return value?.hashCode() ?: 0
+        }
+    }
+
+    class Right<L, R>(val value: R) : Either<L, R>() {
+        override fun equals(other: Any?): Boolean {
+            if (this === other)
+                return true
+            else
+                return (other is Right<*, *> ) && (value == other.value)
+        }
+
+        override fun hashCode(): Int {
+            return value?.hashCode() ?: 0
+        }
+    }
 }

@@ -32,13 +32,11 @@ public class UserSearchFragment extends Fragment {
         mUserName.setOnEditorActionListener((sender, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 onMoveButtonSubmit(sender.getText().toString());
-
                 return true;
             } else {
                 return false;
             }
         });
-        // Snackbar.make(root, "送信", Snackbar.LENGTH_SHORT).show();
         mMove.setOnClickListener(sender -> onMoveButtonSubmit(mUserName.getText().toString()));
         return root;
     }
