@@ -12,6 +12,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.bromne.twilog.R
 import com.bromne.twilog.app.SavedQuery
+import com.bromne.twilog.app.layoutInflater
 
 class HistoryFragment : Fragment() {
 
@@ -52,15 +53,13 @@ class HistoryFragment : Fragment() {
 
     class HistoryAdapter(val context: Context, val items: () -> List<SavedQuery>) : RecyclerView.Adapter<HistoryHolder>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryHolder {
-            val view = LayoutInflater.from(this.context)
-                    .inflate(R.layout.layout_saved_query_user, parent, false)
-            return HistoryHolder(view)
+            return HistoryHolder.of(parent, false)
         }
 
         override fun onBindViewHolder(holder: HistoryHolder, position: Int) {
             val item = this.items()[position]
 
-            holder.setUser(item)
+            holder.setQuery(item)
         }
 
         override fun getItemCount() = this.items().size
@@ -71,9 +70,17 @@ class HistoryFragment : Fragment() {
         val displayName = itemView.findViewById(R.id.displayName) as TextView
         val userName = itemView.findViewById(R.id.userName) as TextView
 
-        fun setUser(query: SavedQuery): Unit {
+        fun setQuery(query: SavedQuery): Unit {
             this.icon.setImageResource(R.drawable.designer_icon)
             this.userName.text = "@" + query.query.userName
+        }
+
+        companion object {
+            fun of(parent :ViewGroup, attachToRoot: Boolean): HistoryHolder {
+                return parent.context.layoutInflater
+                        .inflate(R.layout.layout_saved_query_user, parent, attachToRoot)
+                        .let(::HistoryHolder)
+            }
         }
     }
 
