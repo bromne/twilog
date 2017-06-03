@@ -10,9 +10,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import com.bromne.stereotypes.app.layoutInflater
 import com.bromne.twilog.R
 import com.bromne.twilog.app.SavedQuery
-import com.bromne.twilog.app.layoutInflater
 
 class HistoryFragment : Fragment() {
 

@@ -3,9 +3,9 @@ package com.bromne.twilog.app
 import android.app.Activity
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
-import com.bromne.io.getSerializable
-import com.bromne.io.putSerializable
-import com.bromne.io.update
+import com.bromne.stereotypes.io.getSerializable
+import com.bromne.stereotypes.io.putSerializable
+import com.bromne.stereotypes.io.update
 import com.bromne.twilog.client.TwilogClient
 import com.google.common.collect.ImmutableSet
 import org.joda.time.DateTime
@@ -35,5 +35,3 @@ data class SavedQuery(val query: TwilogClient.Query, val created: DateTime) : Se
 
     override fun hashCode() = this.query.hashCode()
 }
-
-

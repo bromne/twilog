@@ -1,11 +1,8 @@
 package com.bromne.twilog.activity
 
 import android.content.Context
-import android.content.Intent
-import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -17,20 +14,17 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
-import com.bromne.async.ParallelAsyncLoader
-import com.bromne.async.RegularAsyncTask
-import com.bromne.data.toBuilder
-import com.bromne.io.update
+import com.bromne.stereotypes.async.ParallelAsyncLoader
+import com.bromne.stereotypes.async.RegularAsyncTask
+import com.bromne.stereotypes.data.toBuilder
+import com.bromne.stereotypes.view.startAnimation
 import com.bromne.twilog.R
 import com.bromne.twilog.app.SavedQuery
-import com.bromne.twilog.app.favorites
 import com.bromne.twilog.app.history
 import com.bromne.twilog.app.sharedPreferences
 import com.bromne.twilog.client.Result
 import com.bromne.twilog.client.Tweet
 import com.bromne.twilog.client.TwilogClient
-import com.bromne.view.startAnimation
-import com.google.common.collect.ImmutableSet
 import org.joda.time.DateTime
 
 class TweetFragment : Fragment() {
@@ -77,7 +71,7 @@ class TweetFragment : Fragment() {
                 mProgress.visibility = View.INVISIBLE
                 this@TweetFragment.onLoad(result)
                 mWrapper.visibility = View.VISIBLE
-                mWrapper.startAnimation(this@TweetFragment.context, R.anim.fade_in_short)
+                mWrapper.startAnimation(R.anim.fade_in_short)
             }
 
             override fun onException(e: Exception) {
@@ -113,12 +107,12 @@ class TweetFragment : Fragment() {
 
             override fun onLoadFinished(result: Bitmap) {
                 icon.setImageBitmap(result)
-                icon.startAnimation(this@TweetFragment.context, R.anim.fade_in_medium)
+                icon.startAnimation(R.anim.fade_in_medium)
             }
 
             override fun onException(e: Exception) {
                 icon.setImageResource(R.drawable.designer_icon)
-                icon.startAnimation(this@TweetFragment.context, R.anim.fade_in_medium)
+                icon.startAnimation(R.anim.fade_in_medium)
             }
         })
         displayName.text = result.user.display
@@ -175,13 +169,13 @@ class TweetFragment : Fragment() {
                         this@TweetAdapter.cache.put(key, result)
                         if (holder.icon.tag == key) {
                             holder.icon.setImageBitmap(result)
-                            holder.icon.startAnimation(this@TweetAdapter.context, R.anim.fade_in_medium)
+                            holder.icon.startAnimation(R.anim.fade_in_medium)
                         }
                     }
 
                     override fun onException(e: Exception) {
                         holder.icon.setImageResource(R.drawable.designer_icon)
-                        holder.icon.startAnimation(this@TweetAdapter.context, R.anim.fade_in_medium)
+                        holder.icon.startAnimation(R.anim.fade_in_medium)
                     }
                 }
 

@@ -2,6 +2,7 @@ package com.bromne.twilog.client
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import com.bromne.stereotypes.data.excludeNullable
 import org.joda.time.LocalDate
 import org.joda.time.format.DateTimeFormat
 import org.jsoup.Jsoup
@@ -12,7 +13,6 @@ import java.util.ArrayDeque
 import java.util.regex.Pattern
 import com.bromne.twilog.client.TwilogClient.Joint
 import com.bromne.twilog.client.TwilogClient.Order
-import org.jsoup.nodes.Document
 
 class HttpTwilogClient : TwilogClient {
 

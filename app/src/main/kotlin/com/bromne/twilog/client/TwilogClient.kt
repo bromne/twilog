@@ -1,7 +1,7 @@
 package com.bromne.twilog.client
 
 import android.graphics.Bitmap
-import com.bromne.data.Either
+import com.bromne.stereotypes.data.Either
 import org.joda.time.DateTime
 import java.io.Serializable
 import java.util.regex.Pattern
