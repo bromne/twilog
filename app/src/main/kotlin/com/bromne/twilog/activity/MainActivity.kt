@@ -24,6 +24,16 @@ class MainActivity() : AppCompatActivity(),
         setContentView(R.layout.activity_main)
     }
 
+    override fun onOpenStatus(tweet: Tweet) {
+        try {
+            Intent(Intent.ACTION_VIEW, Uri.parse("twitter://status?status_id=" + tweet.id))
+                    .let { startActivity(it) }
+        } catch (e: Exception) {
+            Intent(Intent.ACTION_VIEW, Uri.parse(tweet.status))
+                    .let { startActivity(it) }
+        }
+    }
+
     companion object {
         val QUERY = "query"
 

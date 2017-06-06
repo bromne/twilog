@@ -151,6 +151,7 @@ class TweetFragment : Fragment() {
         override fun onBindViewHolder(holder: TweetHolder, position: Int) {
             val tweet = this.data().tweets[position]
             holder.setTweet(tweet)
+            holder.itemView.setOnClickListener({ this@TweetAdapter.fragment.mListener.onOpenStatus(tweet) })
 
             val key = tweet.user.image.bigger
             if (this.cache[key] != null) {
@@ -207,5 +208,7 @@ class TweetFragment : Fragment() {
     interface OnTweetFragmentInteractionListener {
         var query: TwilogClient.Query
         var client: TwilogClient
+
+        fun onOpenStatus(tweet: Tweet): Unit
     }
 }
