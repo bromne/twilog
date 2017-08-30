@@ -1,6 +1,5 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: 'me.tatarka.retrolambda'
 
 repositories {
     jcenter()
@@ -38,7 +37,6 @@ android {
 
 buildscript {
     dependencies {
-        classpath 'me.tatarka:gradle-retrolambda:3.2.5'
     }
     repositories {
         jcenter()
