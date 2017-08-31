@@ -17,4 +17,6 @@
 
     <string name="font_federation" translatable="false">fonts/federation.ttf</string>
     <string name="font_fontawesome" translatable="false">fonts/fontawesome.ttf</string>
+    <string name="select_date">Select date</string>
+    <string name="search_with_text">Search with text</string>
 </resources>

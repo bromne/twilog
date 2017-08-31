@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    tools:ignore="UnusedAttribute"
     tools:showIn="@layout/activity_main">
 
     <LinearLayout
@@ -13,11 +14,23 @@
         android:layout_height="match_parent"
         android:id="@+id/wrapper">
 
-        <include
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            layout="@layout/layout_search"
-            android:id="@+id/header" />
+            android:background="?attr/colorPrimary"
+            android:elevation="@dimen/margin_card_half"
+            android:minHeight="?attr/actionBarSize"
+            android:scrollbarAlwaysDrawVerticalTrack="true"
+            android:theme="?attr/actionBarTheme"
+            app:contentInsetStart="0dp">
+
+            <include
+                android:id="@+id/header"
+                layout="@layout/layout_search"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </android.support.v7.widget.Toolbar>
 
         <android.support.v7.widget.RecyclerView
             xmlns:android="http://schemas.android.com/apk/res/android"
@@ -30,8 +43,7 @@
             android:scrollbars="vertical"
             app:layoutManager="LinearLayoutManager"
             tools:context=".activity.TweetFragment"
-            tools:listitem="@layout/layout_tweet_list_item"
-            android:padding="@dimen/margin_card_half" />
+            tools:listitem="@layout/layout_tweet_list_item" />
     </LinearLayout>
 
     <ProgressBar

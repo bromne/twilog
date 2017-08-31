@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.Toolbar
 import android.util.LruCache
 import android.view.LayoutInflater
 import android.view.View
@@ -37,6 +38,7 @@ class TweetFragment : Fragment() {
     lateinit internal var mTweets: RecyclerView
     lateinit internal var mProgress: ProgressBar
     lateinit internal var mEmptyMessage: View
+    lateinit internal var mToolbar: Toolbar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,6 +52,13 @@ class TweetFragment : Fragment() {
         mTweets = root.findViewById(R.id.list) as RecyclerView
         mProgress = root.findViewById(R.id.progress) as ProgressBar
         mEmptyMessage = root.findViewById(R.id.no_items)
+
+        mToolbar = root.findViewById(R.id.toolbar) as Toolbar
+        mToolbar.inflateMenu(R.menu.menu_main)
+        mToolbar.setOnMenuItemClickListener({ item ->
+            Toast.makeText(context, "selected", Toast.LENGTH_SHORT).show()
+            true
+        })
 
         return root
     }

@@ -8,43 +8,7 @@
     android:layout_height="match_parent"
     android:padding="@dimen/margin_icon"
     android:id="@+id/lev"
-    android:elevation="@dimen/margin_card_half"
-    tools:ignore="UnusedAttribute"
     android:theme="@style/AppBar">
-    <!--style="@style/AppBar"-->
-
-
-    <!--<ImageView-->
-        <!--android:layout_width="@dimen/icon_side_length_mini"-->
-        <!--android:layout_height="@dimen/icon_side_length_mini"-->
-        <!--android:id="@+id/icon"-->
-        <!--android:contentDescription="@string/icon"-->
-        <!--tools:src="@drawable/designer_icon"-->
-        <!--android:adjustViewBounds="true" />-->
-
-    <!--<TextView-->
-        <!--android:id="@+id/displayName"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:textAppearance="?android:attr/textAppearanceMedium"-->
-        <!--tools:text="Jane Doe"-->
-        <!--android:layout_toEndOf="@id/icon"-->
-        <!--android:layout_marginLeft="@dimen/margin_icon"-->
-        <!--android:textStyle="bold"-->
-        <!--android:textColor="?android:attr/textColorPrimary"-->
-        <!--android:layout_alignBottom="@id/icon" />-->
-    <!--&lt;!&ndash;android:textColor="?attr/color"&ndash;&gt;-->
-
-    <!--<TextView-->
-        <!--android:id="@+id/userName"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:textAppearance="?android:attr/textAppearanceSmall"-->
-        <!--android:layout_marginLeft="@dimen/margin_icon"-->
-        <!--tools:text="\@user"-->
-        <!--android:textColor="@android:color/secondary_text_dark"-->
-        <!--android:layout_toEndOf="@id/displayName"-->
-        <!--android:layout_alignBaseline="@id/displayName" />-->
 
     <include
         android:id="@+id/user"
@@ -71,7 +35,7 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         tools:text="最近"
         android:layout_toEndOf="@id/function_icon"
-        android:layout_marginLeft="@dimen/margin_icon"
+        android:layout_marginStart="@dimen/margin_icon"
         android:textColor="?android:textColorPrimary"
         android:layout_alignBottom="@id/function_icon" />
 
