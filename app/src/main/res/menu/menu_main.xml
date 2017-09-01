@@ -3,10 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item
-        android:visible="true"
-        android:icon="@drawable/designer_icon"
-        android:title="@string/select_date"
-        app:showAsAction="withText" />
-    <item android:title="@string/search_with_text" />
+    <item android:title="@string/select_date"
+        android:id="@+id/select_date" />
+    <item android:title="@string/search_with_text"
+        android:id="@+id/search_with_text"/>
 </menu>

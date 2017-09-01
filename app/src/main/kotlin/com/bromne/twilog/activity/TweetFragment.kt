@@ -1,5 +1,6 @@
 package com.bromne.twilog.activity
 
+import android.app.DatePickerDialog
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Bundle
@@ -7,16 +8,19 @@ import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
+import android.text.TextUtils
 import android.util.LruCache
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.DatePicker
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import com.bromne.stereotypes.async.ParallelAsyncLoader
 import com.bromne.stereotypes.async.RegularAsyncTask
+import com.bromne.stereotypes.data.Either
 import com.bromne.stereotypes.data.toBuilder
 import com.bromne.stereotypes.view.startAnimation
 import com.bromne.twilog.R
@@ -27,8 +31,9 @@ import com.bromne.twilog.client.Result
 import com.bromne.twilog.client.Tweet
 import com.bromne.twilog.client.TwilogClient
 import org.joda.time.DateTime
+import org.joda.time.LocalDate
 
-class TweetFragment : Fragment() {
+class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
     val imageLoader: ParallelAsyncLoader<String, Bitmap> = ParallelAsyncLoader()
 
     lateinit internal var mListener: OnTweetFragmentInteractionListener
@@ -55,15 +60,25 @@ class TweetFragment : Fragment() {
 
         mToolbar = root.findViewById(R.id.toolbar) as Toolbar
         mToolbar.inflateMenu(R.menu.menu_main)
-        mToolbar.setOnMenuItemClickListener({ item ->
-            Toast.makeText(context, "selected", Toast.LENGTH_SHORT).show()
+        mToolbar.setOnMenuItemClickListener({
+            val date: LocalDate = mListener.query.body.map({ it }, { null }) ?: LocalDate.now()
+            when (it.itemId) {
+                R.id.select_date -> {
+                    val dialog = DatePickerDialogFragment.newInstance(date)
+                    dialog.setTargetFragment(this, 0)
+                    dialog.show(this.fragmentManager, "calendar")
+                }
+                R.id.search_with_text -> {
+
+                }
+            }
             true
         })
 
         return root
     }
 
-    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         RegularAsyncTask.execute(object : RegularAsyncTask.Callbacks<Result> {
@@ -97,6 +112,11 @@ class TweetFragment : Fragment() {
         mListener = context as OnTweetFragmentInteractionListener
     }
 
+    override fun onDateSet(view: DatePicker, year: Int, month: Int, dayOfMonth: Int) {
+        val query = TwilogClient.Query(mListener.query.userName, Either.left(LocalDate(year, month + 1, dayOfMonth)), TwilogClient.Order.DESC)
+        mListener.openByQuery(query)
+    }
+
     internal fun onLoad(result: Result): Unit {
         val pref = this.activity.sharedPreferences
         pref.history = pref.history.toBuilder()
@@ -125,7 +145,7 @@ class TweetFragment : Fragment() {
             }
         })
         displayName.text = result.user.display
-        userName.text = "@" + result.user.name
+        userName.text = String.format(getString(R.string.format_username), result.user.name)
 
         functionIcon.text = mListener.query.body.map({
             if (it != null)
@@ -207,7 +227,8 @@ class TweetFragment : Fragment() {
         val icon: ImageView = itemView.findViewById(R.id.icon) as ImageView
 
         fun setTweet(tweet: Tweet): Unit {
-            this.userName.text = "@" + tweet.user.name
+
+            this.userName.text =  "@" + tweet.user.name
             this.displayName.text = tweet.user.display
             this.created.text = tweet.created.toString("yyyy/MM/dd HH:mm:ss")
             this.message.text = tweet.message
@@ -219,5 +240,6 @@ class TweetFragment : Fragment() {
         var client: TwilogClient
 
         fun onOpenStatus(tweet: Tweet): Unit
+        fun openByQuery(query: TwilogClient.Query): Unit
     }
 }

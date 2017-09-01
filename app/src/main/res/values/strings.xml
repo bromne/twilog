@@ -13,10 +13,12 @@
     <string name="find_user">Find User</string>
     <string name="no_items">no items</string>
 
-    <string name="date_format_with_day">dddd, MMMM dd yyyy</string>
+    <string name="date_format_with_day">E, MMMM dd yyyy</string>
 
     <string name="font_federation" translatable="false">fonts/federation.ttf</string>
     <string name="font_fontawesome" translatable="false">fonts/fontawesome.ttf</string>
     <string name="select_date">Select date</string>
     <string name="search_with_text">Search with text</string>
+
+    <string name="format_username" translatable="false">\@%1$s</string>
 </resources>

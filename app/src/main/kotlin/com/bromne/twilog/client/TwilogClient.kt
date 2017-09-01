@@ -3,6 +3,7 @@ package com.bromne.twilog.client
 import android.graphics.Bitmap
 import com.bromne.stereotypes.data.Either
 import org.joda.time.DateTime
+import org.joda.time.LocalDate
 import java.io.Serializable
 import java.util.regex.Pattern
 
@@ -14,7 +15,7 @@ interface TwilogClient {
     fun search(userName: String, query: String, joint: Joint): Result
     fun loadUserIcon(user: User): Bitmap
 
-    data class Query(val userName: String, val body: Either<DateTime?, Criteria>, val order: Order) : Serializable
+    data class Query(val userName: String, val body: Either<LocalDate?, Criteria>, val order: Order) : Serializable
 
     data class Criteria(val keyword: String, val joint :Joint)
 

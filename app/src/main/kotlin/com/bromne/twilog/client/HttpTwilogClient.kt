@@ -21,7 +21,7 @@ class HttpTwilogClient : TwilogClient {
     override fun find(query: TwilogClient.Query): Result {
         val base = "http://twilog.org/${query.userName}"
         val request = query.body.map({
-            val date = it?.let { "/date-" + it.toString("yy-MM-dd") }
+            val date = it?.let { "/date-" + it.toString("yyMMdd") }
             val order = if (query.order == Order.ASC) "/allasc" else ""
             (date ?: "") + order
         }, {
