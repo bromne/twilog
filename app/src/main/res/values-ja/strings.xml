@@ -9,6 +9,14 @@
     <string name="find_user">ユーザーを見つける</string>
     <string name="title_favorites">お気に入り</string>
     <string name="title_history">履歴</string>
-    <string name="select_date">日付を選択</string>
+    <string name="select_date">日付を選択して開く</string>
     <string name="search_with_text">文字列を指定して検索</string>
+    <string name="descending">降順</string>
+    <string name="ascending">昇順</string>
+    <string name="order">順序</string>
+    <string name="change_tweet_order">ツイートの順序を変更</string>
+    <string name="keyword">キーワード</string>
+    <string name="title_search">検索</string>
+    <string name="button_search">検索</string>
+    <string name="cancel">キャンセル</string>
 </resources>

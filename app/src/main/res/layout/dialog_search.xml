@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="@dimen/activity_horizontal_margin">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/title_search"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:visibility="gone" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:labelFor="@+id/keyword"
+        android:text="@string/keyword"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
+    <EditText
+        android:id="@+id/keyword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:imeOptions="actionSearch"
+        android:inputType="text"
+        android:selectAllOnFocus="true"/>
+
+    <RadioGroup
+        android:id="@+id/junction"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/and"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:text="@string/and" />
+
+        <RadioButton
+            android:id="@+id/or"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:text="@string/or" />
+
+    </RadioGroup>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/cancel_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/cancel" />
+
+        <Button
+            android:id="@+id/search_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/button_search" />
+
+    </LinearLayout>
+
+</LinearLayout>

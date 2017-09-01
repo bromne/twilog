@@ -3,6 +3,7 @@ package com.bromne.twilog.activity
 import android.app.DatePickerDialog
 import android.content.Context
 import android.graphics.Bitmap
+import android.location.Criteria
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
@@ -66,9 +67,14 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                 R.id.select_date -> {
                     val dialog = DatePickerDialogFragment.newInstance(date)
                     dialog.setTargetFragment(this, 0)
-                    dialog.show(this.fragmentManager, "calendar")
+                    dialog.show(this.fragmentManager, "Calendar")
                 }
                 R.id.search_with_text -> {
+                    val criteria = mListener.query.body.map({ d -> TwilogClient.Criteria("", TwilogClient.Joint.AND) }, { c -> c })
+                    val dialog = SearchDialog.newInstance(criteria, { c -> mListener.openByQuery(TwilogClient.Query(mListener.query.userName, Either.right(c), TwilogClient.Order.DESC)) })
+                    dialog.show(this.fragmentManager, "SearchDialog")
+                }
+                R.id.change_tweet_order -> {
 
                 }
             }
@@ -227,7 +233,6 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         val icon: ImageView = itemView.findViewById(R.id.icon) as ImageView
 
         fun setTweet(tweet: Tweet): Unit {
-
             this.userName.text =  "@" + tweet.user.name
             this.displayName.text = tweet.user.display
             this.created.text = tweet.created.toString("yyyy/MM/dd HH:mm:ss")

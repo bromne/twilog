@@ -17,8 +17,22 @@
 
     <string name="font_federation" translatable="false">fonts/federation.ttf</string>
     <string name="font_fontawesome" translatable="false">fonts/fontawesome.ttf</string>
-    <string name="select_date">Select date</string>
+    <string name="select_date">Open by date</string>
     <string name="search_with_text">Search with text</string>
+    <string name="change_tweet_order">change tweet order</string>
 
     <string name="format_username" translatable="false">\@%1$s</string>
+
+    <string name="order">order</string>
+    <string name="ascending">ascending</string>
+    <string name="descending">descending</string>
+
+    <string name="title_search">Search</string>
+    <string name="keyword">Keyword</string>
+
+    <string name="button_search">Search</string>
+    <string name="cancel">Cancel</string>
+
+    <string name="and">AND</string>
+    <string name="or">OR</string>
 </resources>

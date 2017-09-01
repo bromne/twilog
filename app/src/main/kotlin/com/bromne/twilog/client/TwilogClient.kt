@@ -17,7 +17,7 @@ interface TwilogClient {
 
     data class Query(val userName: String, val body: Either<LocalDate?, Criteria>, val order: Order) : Serializable
 
-    data class Criteria(val keyword: String, val joint :Joint)
+    data class Criteria(val keyword: String, val joint :Joint) : Serializable
 
     enum class Joint {
         AND,
