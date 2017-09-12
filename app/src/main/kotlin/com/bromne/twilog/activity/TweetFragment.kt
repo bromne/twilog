@@ -3,13 +3,11 @@ package com.bromne.twilog.activity
 import android.app.DatePickerDialog
 import android.content.Context
 import android.graphics.Bitmap
-import android.location.Criteria
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
-import android.text.TextUtils
 import android.util.LruCache
 import android.view.LayoutInflater
 import android.view.View
@@ -75,7 +73,7 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                     dialog.show(this.fragmentManager, "SearchDialog")
                 }
                 R.id.change_tweet_order -> {
-
+                    // TODO: ツイートの順序を変更
                 }
             }
             true
@@ -86,31 +84,7 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        RegularAsyncTask.execute(object : RegularAsyncTask.Callbacks<Result> {
-            override fun onPreLoad() {
-                mWrapper.visibility =  View.INVISIBLE
-                mProgress.visibility = View.VISIBLE
-            }
-
-            override fun loadInBackground(publishProgress: (Int) -> Unit): Result {
-                return mListener.client.find(mListener.query)
-            }
-
-            override fun onLoadFinished(result: Result): Unit {
-                mProgress.visibility = View.INVISIBLE
-                this@TweetFragment.onLoad(result)
-                mWrapper.visibility = View.VISIBLE
-                mWrapper.startAnimation(R.anim.fade_in_short)
-            }
-
-            override fun onException(e: Exception) {
-                mProgress.visibility = View.INVISIBLE
-                Toast.makeText(this@TweetFragment.context, "失敗", Toast.LENGTH_SHORT)
-                        .show()
-                mEmptyMessage.visibility = View.VISIBLE
-            }
-        })
+        loadTweets(mListener.query)
     }
 
     override fun onAttach(context: Context?) {
@@ -121,6 +95,35 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
     override fun onDateSet(view: DatePicker, year: Int, month: Int, dayOfMonth: Int) {
         val query = TwilogClient.Query(mListener.query.userName, Either.left(LocalDate(year, month + 1, dayOfMonth)), TwilogClient.Order.DESC)
         mListener.openByQuery(query)
+    }
+
+    internal fun loadTweets(query: TwilogClient.Query): Unit {
+        RegularAsyncTask.execute(object : RegularAsyncTask.Callbacks<Result> {
+            override fun onPreLoad() {
+                mProgress.visibility = View.VISIBLE
+            }
+
+            override fun loadInBackground(publishProgress: (Int) -> Unit): Result {
+                return mListener.client.find(query)
+            }
+
+            override fun onLoadFinished(result: Result): Unit {
+                mProgress.visibility = View.INVISIBLE
+                this@TweetFragment.onLoad(result)
+                if (mTweets.visibility == View.INVISIBLE) {
+                    mTweets.visibility = View.VISIBLE
+                    mTweets.startAnimation(R.anim.fade_in_short)
+                }
+            }
+
+            override fun onException(e: Exception) {
+                mProgress.visibility = View.INVISIBLE
+                mTweets.visibility = View.INVISIBLE
+                Toast.makeText(this@TweetFragment.context, "失敗", Toast.LENGTH_SHORT)
+                        .show()
+                mEmptyMessage.visibility = View.VISIBLE
+            }
+        })
     }
 
     internal fun onLoad(result: Result): Unit {
