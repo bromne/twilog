@@ -160,16 +160,18 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             if (it != null)
                 R.string.fontawesome_calendar
             else
-                R.string.fontawesome_calendar_check_o
+                R.string.fontawesome_clock_o
         } , {
             R.string.fontawesome_search
         }).let { context.getString(it) }
 
-        condition.text = mListener.query.body.map({
-            it?.toString(context.getString(R.string.date_format_with_day)) ?: context.getString(R.string.recent)
+        val sort = (if (mListener.query.order == TwilogClient.Order.ASC) R.string.ascending else R.string.descending).let { context.getString(it) }
+        val condition_text = mListener.query.body.map({
+            it?.toString(context.getString(R.string.date_format_with_day)) ?: context.getString(R.string.recent_tweets)
         }, {
             "\""+ it.keyword + "\""
         })
+        condition.text = context.getString(R.string.query_representation_format, condition_text, sort)
 
         mTweets.layoutManager = LinearLayoutManager(this.context)
         mTweets.adapter = TweetAdapter(this.context, this, { result })
@@ -188,7 +190,7 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
 
         override fun onBindViewHolder(holder: TweetHolder, position: Int) {
             val tweet = this.data().tweets[position]
-            holder.setTweet(tweet)
+            holder.setTweet(this.context, tweet)
             holder.itemView.setOnClickListener({ this@TweetAdapter.fragment.mListener.onOpenStatus(tweet) })
 
             val key = tweet.user.image.bigger
@@ -235,7 +237,7 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         val message: TextView = itemView.findViewById(R.id.message) as TextView
         val icon: ImageView = itemView.findViewById(R.id.icon) as ImageView
 
-        fun setTweet(tweet: Tweet): Unit {
+        fun setTweet(context: Context, tweet: Tweet): Unit {
             this.userName.text =  "@" + tweet.user.name
             this.displayName.text = tweet.user.display
             this.created.text = tweet.created.toString("yyyy/MM/dd HH:mm:ss")

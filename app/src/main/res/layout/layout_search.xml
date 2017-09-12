@@ -20,7 +20,7 @@
         android:layout_height="@dimen/icon_side_length_mini"
         android:layout_below="@id/user"
         android:layout_marginTop="@dimen/margin_card_half"
-        tools:text="@string/fontawesome_calendar_check_o"
+        tools:text="@string/fontawesome_clock_o"
         android:textSize="@dimen/text_margin"
         app:typeface="@string/font_fontawesome"
         android:textColor="?android:textColorSecondary"
@@ -33,10 +33,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        tools:text="最近"
+        tools:text="最近のツイート，降順"
         android:layout_toEndOf="@id/function_icon"
         android:layout_marginStart="@dimen/margin_icon"
         android:textColor="?android:textColorPrimary"
         android:layout_alignBottom="@id/function_icon" />
-
 </RelativeLayout>

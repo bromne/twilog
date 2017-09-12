@@ -4,7 +4,7 @@
 
     <string name="icon">icon</string>
 
-    <string name="recent">Recent</string>
+    <string name="recent_tweets">Recent tweets</string>
     <string name="title_favorites">Favorites</string>
     <string name="title_history">History</string>
 
@@ -35,4 +35,6 @@
 
     <string name="and">AND</string>
     <string name="or">OR</string>
+
+    <string name="query_representation_format">%1$s, %2$s</string>
 </resources>

@@ -5,7 +5,7 @@
     <string name="move">移動</string>
     <string name="no_items">なにもありません</string>
     <string name="date_format_with_day">yyyy年MM月dd日（E）</string>
-    <string name="recent">最近</string>
+    <string name="recent_tweets">最近のツイート</string>
     <string name="find_user">ユーザーを見つける</string>
     <string name="title_favorites">お気に入り</string>
     <string name="title_history">履歴</string>
@@ -19,4 +19,5 @@
     <string name="title_search">検索</string>
     <string name="button_search">検索</string>
     <string name="cancel">キャンセル</string>
+    <string name="query_representation_format">%1$s，%2$s</string>
 </resources>
