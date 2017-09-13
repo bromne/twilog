@@ -28,7 +28,10 @@ interface TwilogClient {
 
     enum class Order {
         ASC,
-        DESC
+        DESC;
+
+        val reversed: Order
+            get() = if (this == ASC) DESC else ASC
     }
 }
 

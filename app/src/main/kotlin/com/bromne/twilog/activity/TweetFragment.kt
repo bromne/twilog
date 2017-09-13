@@ -73,7 +73,9 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                     dialog.show(this.fragmentManager, "SearchDialog")
                 }
                 R.id.change_tweet_order -> {
-                    // TODO: ツイートの順序を変更
+                    val query = mListener.query
+                    val reversed = TwilogClient.Query(query.userName, query.body, query.order.reversed)
+                    loadTweets(reversed)
                 }
             }
             true
