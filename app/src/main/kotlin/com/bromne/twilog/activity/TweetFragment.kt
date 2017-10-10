@@ -75,7 +75,8 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                 R.id.change_tweet_order -> {
                     val query = mListener.query
                     val reversed = TwilogClient.Query(query.userName, query.body, query.order.reversed)
-                    loadTweets(reversed)
+                    mListener.query = reversed
+                    loadTweets(mListener.query)
                 }
             }
             true
@@ -145,14 +146,19 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                 return mListener.client.loadUserIcon(result.user)
             }
 
+            @Suppress("NAME_SHADOWING")
             override fun onLoadFinished(result: Bitmap) {
+                if (icon.drawable == null) {
+                    icon.startAnimation(R.anim.fade_in_medium)
+                }
                 icon.setImageBitmap(result)
-                icon.startAnimation(R.anim.fade_in_medium)
             }
 
             override fun onException(e: Exception) {
+                if (icon.drawable == null) {
+                    icon.startAnimation(R.anim.fade_in_medium)
+                }
                 icon.setImageResource(R.drawable.designer_icon)
-                icon.startAnimation(R.anim.fade_in_medium)
             }
         })
         displayName.text = result.user.display
@@ -240,7 +246,7 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         val icon: ImageView = itemView.findViewById(R.id.icon) as ImageView
 
         fun setTweet(context: Context, tweet: Tweet): Unit {
-            this.userName.text =  "@" + tweet.user.name
+            this.userName.text = context.getString(R.string.format_username, tweet.user.name)
             this.displayName.text = tweet.user.display
             this.created.text = tweet.created.toString("yyyy/MM/dd HH:mm:ss")
             this.message.text = tweet.message
