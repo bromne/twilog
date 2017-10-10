@@ -222,7 +222,7 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                     }
                 }
 
-                this.fragment.imageLoader.loadOrRegister(tweet.user.image.bigger, callbacks)
+                this.fragment.imageLoader.loadOrRegister(key, callbacks)
             }
         }
 
