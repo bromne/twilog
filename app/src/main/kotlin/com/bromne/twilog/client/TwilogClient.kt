@@ -10,14 +10,12 @@ import java.util.regex.Pattern
 
 interface TwilogClient {
     fun find(query :Query): Result
-    fun findRecent(userName: String): Result
-    fun findByDate(userName: String): Result
-    fun search(userName: String, query: String, joint: Joint): Result
+
     fun loadUserIcon(user: User): Bitmap
 
     data class Query(val userName: String, val body: Either<LocalDate?, Criteria>, val order: Order) : Serializable
 
-    data class Criteria(val keyword: String, val joint :Joint) : Serializable
+    data class Criteria(val keyword: String, val joint :Joint, val page: Int? = null) : Serializable
 
     enum class Joint {
         AND,

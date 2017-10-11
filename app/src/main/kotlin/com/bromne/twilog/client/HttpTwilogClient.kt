@@ -26,9 +26,10 @@ class HttpTwilogClient : TwilogClient {
             (date ?: "") + order
         }, {
             val order = if (query.order == Order.ASC) "order=allasc" else null
+            val page = it.page?.let { p -> "page=" + p }
 
             // TODO: 検索文字列のサニタイズ
-            val queryString = listOf("word=" + it.keyword, "ao=" + it.joint, order)
+            val queryString = listOf("word=" + it.keyword, "ao=" + it.joint, order, page)
                     .excludeNullable()
                     .joinToString("&")
 
@@ -36,19 +37,6 @@ class HttpTwilogClient : TwilogClient {
         })
 
         val url = base + request
-        return extractResultByUrl(url)
-    }
-
-    override fun findRecent(userName: String): Result {
-        throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun findByDate(userName: String): Result {
-        throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun search(userName: String, query: String, joint: Joint): Result {
-        val url = "http://twilog.org/$userName/search?word=$query&ao=$joint"
         return extractResultByUrl(url)
     }
 
@@ -112,6 +100,7 @@ class HttpTwilogClient : TwilogClient {
                     .text()
                     .extractWithPattern(timeFormat)
 
+            @Suppress("FoldInitializerAndIfToElvis")
             if (time == null)
                 return null
 
@@ -128,8 +117,8 @@ class HttpTwilogClient : TwilogClient {
 
         val tweeter = tweeterFromElement(document)
 
-        val tweetElements = document.select("#content")
-                .select("h3.title01,section.tl-tweets article.tl-tweet")
+        val content = document.select("#content")
+        val tweetElements = content.select("h3.title01,section.tl-tweets article.tl-tweet")
 
         val groups = extractGroup(tweetElements)
 
@@ -152,6 +141,7 @@ class HttpTwilogClient : TwilogClient {
                 .excludeNullable()
                 .toList()
 
-        return Result(tweeter, tweets)
+        val hasNext = content.select("ul.nav-link li.nav-next a").count() > 0
+        return Result(tweeter, tweets, hasNext)
     }
 }

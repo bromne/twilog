@@ -29,6 +29,7 @@ import com.bromne.twilog.app.sharedPreferences
 import com.bromne.twilog.client.Result
 import com.bromne.twilog.client.Tweet
 import com.bromne.twilog.client.TwilogClient
+import com.bromne.view.EndlessRecyclerOnScrollListener
 import org.joda.time.DateTime
 import org.joda.time.LocalDate
 
@@ -43,6 +44,8 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
     lateinit internal var mProgress: ProgressBar
     lateinit internal var mEmptyMessage: View
     lateinit internal var mToolbar: Toolbar
+
+    var mHasNext: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -181,14 +184,52 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         })
         condition.text = context.getString(R.string.query_representation_format, condition_text, sort)
 
-        mTweets.layoutManager = LinearLayoutManager(this.context)
-        mTweets.adapter = TweetAdapter(this.context, this, { result })
+        val manager = LinearLayoutManager(this.context)
+        val adapter = TweetAdapter(this.context, this, result)
+        mTweets.layoutManager = manager
+        mTweets.adapter = adapter
+        mTweets.addOnScrollListener(object : EndlessRecyclerOnScrollListener(manager) {
+            override fun onLoadMore(currentPage: Int) {
+                if (!mHasNext)
+                    return
+
+                val criteria: TwilogClient.Criteria? = mListener.query.body.map({ null }, { it })
+
+                @Suppress("FoldInitializerAndIfToElvis")
+                if (criteria == null)
+                    return
+
+                val next = criteria.copy(page = currentPage)
+                RegularAsyncTask.execute(object : RegularAsyncTask.Callbacks<Result> {
+                    override fun loadInBackground(publishProgress: (Int) -> Unit): Result {
+                        return mListener.client.find(mListener.query.copy(body = Either.right(next)))
+                    }
+
+                    @Suppress("NAME_SHADOWING")
+                    override fun onLoadFinished(result: Result): Unit {
+                        mHasNext = result.hasNext
+                        adapter.appendTweets(result.tweets)
+                    }
+
+                    override fun onException(e: Exception) {
+                        Toast.makeText(this@TweetFragment.context, "失敗", Toast.LENGTH_SHORT)
+                                .show()
+                    }
+                })
+
+            }
+        })
     }
 
-    class TweetAdapter(val context: Context, val fragment: TweetFragment, val data: () -> Result) : RecyclerView.Adapter<TweetHolder>() {
+    class TweetAdapter(val context: Context, val fragment: TweetFragment, var data: Result) : RecyclerView.Adapter<TweetHolder>() {
         internal val cache: LruCache<String, Bitmap> = LruCache(100)
 
-        override fun getItemCount() = this.data().tweets.size
+        fun appendTweets(tweets: List<Tweet>) {
+            this.data = this.data.copy(tweets = this.data.tweets.plus(tweets))
+            notifyDataSetChanged()
+        }
+
+        override fun getItemCount() = this.data.tweets.size
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TweetHolder {
             val view = LayoutInflater.from(this.context)
@@ -197,7 +238,7 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         }
 
         override fun onBindViewHolder(holder: TweetHolder, position: Int) {
-            val tweet = this.data().tweets[position]
+            val tweet = this.data.tweets[position]
             holder.setTweet(this.context, tweet)
             holder.itemView.setOnClickListener({ this@TweetAdapter.fragment.mListener.onOpenStatus(tweet) })
 

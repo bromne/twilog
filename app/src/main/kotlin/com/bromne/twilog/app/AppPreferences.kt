@@ -9,6 +9,7 @@ import com.bromne.stereotypes.io.update
 import com.bromne.twilog.client.TwilogClient
 import com.google.common.collect.ImmutableSet
 import org.joda.time.DateTime
+import java.io.InvalidClassException
 import java.io.Serializable
 
 val FAVORITES = "favorites"
@@ -22,7 +23,13 @@ var SharedPreferences.favorites: ImmutableSet<SavedQuery>
     set(value) = this.update { it.putSerializable(FAVORITES, value) }
 
 var SharedPreferences.history: ImmutableSet<SavedQuery>
-    get() = this.getSerializable(HISTORY) ?: ImmutableSet.of()
+    get() {
+        try {
+            return this.getSerializable(HISTORY) ?: ImmutableSet.of()
+        } catch (e: InvalidClassException) {
+            return ImmutableSet.of()
+        }
+    }
     set(value) = this.update { it.putSerializable(HISTORY, value) }
 
 data class SavedQuery(val query: TwilogClient.Query, val created: DateTime) : Serializable {
