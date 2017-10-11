@@ -4,7 +4,7 @@ import org.joda.time.LocalDateTime
 import java.text.MessageFormat
 import java.util.regex.Pattern
 
-data class Tweet(val status: String, val user: User, val created: LocalDateTime, val message: String) {
+data class Tweet(val status: String, val user: User, val created: LocalDateTime, val message: String, val raw: String) {
     val id :Long = this.status.extractWithPattern(Tweet.idPattern)
             .let { java.lang.Long.parseLong(it) }
     override fun toString(): String = MessageFormat.format("[{0} {1}] {2}", this.created.toString("yyyy-MM-dd HH:mm:ss"), this.user.name, this.message)

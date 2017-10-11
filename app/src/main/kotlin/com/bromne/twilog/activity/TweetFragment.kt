@@ -8,6 +8,8 @@ import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
+import android.text.Html
+import android.text.method.LinkMovementMethod
 import android.util.LruCache
 import android.view.LayoutInflater
 import android.view.View
@@ -286,11 +288,15 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         val message: TextView = itemView.findViewById(R.id.message) as TextView
         val icon: ImageView = itemView.findViewById(R.id.icon) as ImageView
 
+        init {
+            this.message.movementMethod = LinkMovementMethod.getInstance()
+        }
+
         fun setTweet(context: Context, tweet: Tweet): Unit {
             this.userName.text = context.getString(R.string.format_username, tweet.user.name)
             this.displayName.text = tweet.user.display
             this.created.text = tweet.created.toString("yyyy/MM/dd HH:mm:ss")
-            this.message.text = tweet.message
+            this.message.text = Html.fromHtml(tweet.raw)
         }
     }
 

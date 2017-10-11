@@ -108,8 +108,9 @@ class HttpTwilogClient : TwilogClient {
                     .attr("href")
             val created = dateTimeFormat.parseLocalDateTime("${date.toString("yyyy-MM-dd")} $time")
             val name = element.select(".tl-name span").text().extractWithPattern(nameFormat)
-            val message = element.select(".tl-text").text()
-            return Tweet(status, users[name]!!, created, message)
+            val raw = element.select("p.tl-text").apply { select(".invisible").remove() }
+            val message = raw.text()
+            return Tweet(status, users[name]!!, created, message, raw.html())
         }
 
         val ua = System.getProperty("http.agent")
