@@ -110,7 +110,8 @@ class HttpTwilogClient : TwilogClient {
             val name = element.select(".tl-name span").text().extractWithPattern(nameFormat)
             val raw = element.select("p.tl-text").apply { select(".invisible").remove() }
             val message = raw.text()
-            return Tweet(status, users[name]!!, created, message, raw.html())
+            val isRetweeted = element.select(".tl-retweet").isEmpty().not()
+            return Tweet(status, users[name]!!, created, message, raw.html(), isRetweeted)
         }
 
         val ua = System.getProperty("http.agent")

@@ -4,7 +4,7 @@ import org.joda.time.LocalDateTime
 import java.text.MessageFormat
 import java.util.regex.Pattern
 
-data class Tweet(val status: String, val user: User, val created: LocalDateTime, val message: String, val raw: String) {
+data class Tweet(val status: String, val user: User, val created: LocalDateTime, val message: String, val raw: String, val isRetweet: Boolean) {
     val id :Long = this.status.extractWithPattern(Tweet.idPattern)
             .let { java.lang.Long.parseLong(it) }
     override fun toString(): String = MessageFormat.format("[{0} {1}] {2}", this.created.toString("yyyy-MM-dd HH:mm:ss"), this.user.name, this.message)
@@ -23,8 +23,8 @@ data class UserImage(val base: String, val extension: String) {
     val mini = this.base + "_mini" + this.extension
 
     companion object {
-        val PATTERN_NORMAL = Pattern.compile("(.+)_normal(\\..+)")!!
-        val PATTERN_BIGGER = Pattern.compile("(.+)_bigger(\\..+)")!!
+        val PATTERN_NORMAL = Pattern.compile("(.+)_normal(\\..+|)")!!
+        val PATTERN_BIGGER = Pattern.compile("(.+)_bigger(\\..+|)")!!
 
         fun fromNormal(url: String) = fromPattern(url, PATTERN_NORMAL)
         fun fromBigger(url: String) = fromPattern(url, PATTERN_BIGGER)

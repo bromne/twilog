@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/layout"
     android:layout_width="match_parent"
@@ -65,13 +67,43 @@
                 android:textColor="@android:color/primary_text_light"
                 tools:text="あのイーハトーヴォのすきとおった風、夏でも底に冷たさをもつ青いそら、うつくしい森で飾られたモリーオ市、郊外のぎらぎらひかる草の波。" />
 
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/retweet"
+                android:layout_toEndOf="@id/icon"
+                android:layout_below="@id/message"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <com.bromne.view.TypefaceTextView
+                    android:id="@+id/retweet_icon"
+                    android:layout_width="@dimen/icon_side_length_micro"
+                    android:layout_height="@dimen/icon_side_length_micro"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:gravity="center"
+                    app:typeface="@string/font_fontawesome"
+                    android:text="@string/fontawesome_retweet"
+                    tools:ignore="SpUsage"/>
+
+                <TextView
+                    android:id="@+id/retweeted_by"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    tools:text="\@bromne がリツイート"
+                    android:layout_toEndOf="@id/retweet_icon"
+                    android:layout_alignBottom="@id/retweet_icon"
+                    android:layout_marginStart="@dimen/margin_icon" />
+            </RelativeLayout>
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 tools:text="2017/05/01 12:34:56"
                 android:id="@+id/created"
-                android:layout_below="@id/message"
+                android:layout_below="@id/retweet"
                 android:layout_toEndOf="@id/icon" />
         </RelativeLayout>
 

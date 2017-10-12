@@ -17,6 +17,7 @@ import android.view.ViewGroup
 import android.widget.DatePicker
 import android.widget.ImageView
 import android.widget.ProgressBar
+import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
 import com.bromne.stereotypes.async.ParallelAsyncLoader
@@ -218,7 +219,6 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                                 .show()
                     }
                 })
-
             }
         })
     }
@@ -236,6 +236,8 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TweetHolder {
             val view = LayoutInflater.from(this.context)
                     .inflate(R.layout.layout_tweet_list_item, parent, false)
+            val retweetedBy = view.findViewById(R.id.retweeted_by) as TextView
+            retweetedBy.text = this.context.getString(R.string.retweeted_by, this.data.user.name)
             return TweetHolder(view)
         }
 
@@ -286,6 +288,7 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         val userName: TextView = itemView.findViewById(R.id.userName) as TextView
         val created: TextView = itemView.findViewById(R.id.created) as TextView
         val message: TextView = itemView.findViewById(R.id.message) as TextView
+        val retweet: RelativeLayout = itemView.findViewById(R.id.retweet) as RelativeLayout
         val icon: ImageView = itemView.findViewById(R.id.icon) as ImageView
 
         init {
@@ -297,6 +300,8 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             this.displayName.text = tweet.user.display
             this.created.text = tweet.created.toString("yyyy/MM/dd HH:mm:ss")
             this.message.text = Html.fromHtml(tweet.raw)
+
+            this.retweet.visibility = if (tweet.isRetweet) RelativeLayout.VISIBLE else RelativeLayout.GONE
         }
     }
 
