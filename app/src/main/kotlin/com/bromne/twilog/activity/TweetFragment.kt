@@ -3,9 +3,10 @@ package com.bromne.twilog.activity
 import android.app.DatePickerDialog
 import android.content.Context
 import android.graphics.Bitmap
-import android.media.Image
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
@@ -40,10 +41,13 @@ import org.joda.time.LocalDate
 class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
     val imageLoader: ParallelAsyncLoader<String, Bitmap> = ParallelAsyncLoader()
 
+    internal var mResult: Result? = null
+
     lateinit internal var mListener: OnTweetFragmentInteractionListener
 
     lateinit internal var mWrapper: View
     lateinit internal var mHeader: View
+    lateinit internal var mSwipeRefresh: SwipeRefreshLayout
     lateinit internal var mTweets: RecyclerView
     lateinit internal var mProgress: ProgressBar
     lateinit internal var mEmptyMessage: View
@@ -60,9 +64,27 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
 
         mWrapper = root.findViewById(R.id.wrapper)
         mHeader = root.findViewById(R.id.header)
+        mSwipeRefresh = root.findViewById(R.id.refresh) as SwipeRefreshLayout
         mTweets = root.findViewById(R.id.list) as RecyclerView
         mProgress = root.findViewById(R.id.progress) as ProgressBar
         mEmptyMessage = root.findViewById(R.id.no_items)
+
+        mSwipeRefresh.setOnRefreshListener({
+            val result = mResult
+            if (result != null) {
+                RegularAsyncTask.execute(object : RegularAsyncTask.Callbacks<Unit> {
+                    override fun loadInBackground(publishProgress: (Int) -> Unit) = mListener.client.forceUpdate(result.user)
+
+                    override fun onException(e: Exception) {
+                    }
+
+                    @Suppress("NAME_SHADOWING")
+                    override fun onLoadFinished(result: Unit) {
+                        loadTweets(mListener.query, false)
+                    }
+                })
+            }
+        })
 
         mToolbar = root.findViewById(R.id.toolbar) as Toolbar
         mToolbar.inflateMenu(R.menu.menu_main)
@@ -83,7 +105,7 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                     val query = mListener.query
                     val reversed = TwilogClient.Query(query.userName, query.body, query.order.reversed)
                     mListener.query = reversed
-                    loadTweets(mListener.query)
+                    loadTweets(mListener.query, true)
                 }
             }
             true
@@ -94,7 +116,7 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        loadTweets(mListener.query)
+        loadTweets(mListener.query, true)
     }
 
     override fun onAttach(context: Context?) {
@@ -107,10 +129,11 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         mListener.openByQuery(query)
     }
 
-    internal fun loadTweets(query: TwilogClient.Query): Unit {
+    internal fun loadTweets(query: TwilogClient.Query, enableIndicator: Boolean): Unit {
         RegularAsyncTask.execute(object : RegularAsyncTask.Callbacks<Result> {
             override fun onPreLoad() {
-                mProgress.visibility = View.VISIBLE
+                if (enableIndicator)
+                    mProgress.visibility = View.VISIBLE
             }
 
             override fun loadInBackground(publishProgress: (Int) -> Unit): Result {
@@ -119,6 +142,7 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
 
             override fun onLoadFinished(result: Result): Unit {
                 mProgress.visibility = View.INVISIBLE
+                mSwipeRefresh.isRefreshing = false
                 this@TweetFragment.onLoad(result)
                 if (mTweets.visibility == View.INVISIBLE) {
                     mTweets.visibility = View.VISIBLE
@@ -137,6 +161,8 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
     }
 
     internal fun onLoad(result: Result): Unit {
+        mResult = result
+
         val pref = this.activity.sharedPreferences
         pref.history = pref.history.toBuilder()
                 .add(SavedQuery(this.mListener.query, DateTime.now()))
@@ -150,7 +176,7 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
 
         this.imageLoader.loadOrRegister(result.user.image.bigger, object : RegularAsyncTask.Callbacks<Bitmap> {
             override fun loadInBackground(publishProgress: (Int) -> Unit): Bitmap {
-                return mListener.client.loadUserIcon(result.user)
+                return mListener.client.loadUserIcon(result.user.image.bigger)
             }
 
             @Suppress("NAME_SHADOWING")
@@ -194,6 +220,7 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         mTweets.adapter = adapter
         mTweets.addOnScrollListener(object : EndlessRecyclerOnScrollListener(manager) {
             override fun onLoadMore(currentPage: Int) {
+                //if (mListener.query.)
                 if (!mHasNext)
                     return
 
@@ -227,7 +254,12 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
     class TweetAdapter(val context: Context, val fragment: TweetFragment, var data: Result) : RecyclerView.Adapter<ViewHolder>() {
         internal val cache: LruCache<String, Bitmap> = LruCache(100)
 
-        fun appendTweets(tweets: List<Tweet>) {
+        init {
+            val none = BitmapFactory.decodeResource(this.context.resources, R.drawable.designer_icon)
+            this.cache.put("", none)
+        }
+
+        fun appendTweets(tweets: List<Tweet?>) {
             this.data = this.data.copy(tweets = this.data.tweets.plus(tweets))
             notifyDataSetChanged()
         }
@@ -263,9 +295,13 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                 is ViewHolder.TweetHolder -> {
                     val tweet = this.data.tweets[position]
                     holder.setTweet(this.context, tweet)
-                    holder.itemView.setOnClickListener({ this@TweetAdapter.fragment.mListener.onOpenStatus(tweet) })
 
-                    val key = tweet.user.image.bigger
+                    if (tweet != null)
+                        holder.itemView.setOnClickListener({ this@TweetAdapter.fragment.mListener.onOpenStatus(tweet) })
+                    else
+                        holder.itemView.setOnClickListener(null)
+
+                    val key = tweet?.user?.image?.bigger ?: ""
                     if (this.cache[key] != null) {
                         holder.icon.setImageBitmap(this.cache[key]!!)
                     } else {
@@ -275,7 +311,7 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                             }
 
                             override fun loadInBackground(publishProgress: (Int) -> Unit): Bitmap {
-                                return this@TweetAdapter.fragment.mListener.client.loadUserIcon(tweet.user)
+                                return this@TweetAdapter.fragment.mListener.client.loadUserIcon(key)
                             }
 
                             override fun onLoadFinished(result: Bitmap) {
@@ -330,13 +366,13 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                 this.message.movementMethod = LinkMovementMethod.getInstance()
             }
 
-            fun setTweet(context: Context, tweet: Tweet): Unit {
-                this.userName.text = context.getString(R.string.format_username, tweet.user.name)
-                this.displayName.text = tweet.user.display
-                this.created.text = tweet.created.toString("yyyy/MM/dd HH:mm:ss")
-                this.message.text = Html.fromHtml(tweet.raw)
+            fun setTweet(context: Context, tweet: Tweet?): Unit {
+                this.userName.text = if (tweet != null) context.getString(R.string.format_username, tweet.user.name) else ""
+                this.displayName.text = tweet?.user?.display ?: context.getString(R.string.refusal)
+                this.created.text = tweet?.created?.toString(context.getString(R.string.format_date)) ?: ""
+                this.message.text = if (tweet != null) Html.fromHtml(tweet.raw) else ""
 
-                this.retweet.visibility = if (tweet.isRetweet) RelativeLayout.VISIBLE else RelativeLayout.GONE
+                this.retweet.visibility = if (tweet != null && tweet.isRetweet) RelativeLayout.VISIBLE else RelativeLayout.GONE
             }
         }
 

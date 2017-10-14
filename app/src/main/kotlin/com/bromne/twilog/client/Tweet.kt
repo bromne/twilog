@@ -43,4 +43,4 @@ data class UserImage(val base: String, val extension: String) {
 
 }
 
-data class Result(val user: User, val tweets: List<Tweet>, val hasNext: Boolean)
+data class Result(val user: User, val tweets: List<Tweet?>, val hasNext: Boolean)

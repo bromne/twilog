@@ -13,6 +13,7 @@ import java.util.ArrayDeque
 import java.util.regex.Pattern
 import com.bromne.twilog.client.TwilogClient.Joint
 import com.bromne.twilog.client.TwilogClient.Order
+import org.jsoup.Connection
 
 class HttpTwilogClient : TwilogClient {
 
@@ -40,15 +41,25 @@ class HttpTwilogClient : TwilogClient {
         return extractResultByUrl(url)
     }
 
-    override fun loadUserIcon(user: User): Bitmap {
-        if (this.iconCache.contains(user.image.bigger)) {
-            return iconCache[user.image.bigger]!!
+    override fun loadUserIcon(url: String): Bitmap {
+        if (this.iconCache.contains(url)) {
+            return iconCache[url]!!
         } else {
-            val url = URL(user.image.bigger)
-            val bitmap = BitmapFactory.decodeStream(url.openStream())
-            iconCache[user.image.bigger]
+            val bitmap = BitmapFactory.decodeStream(URL(url).openStream())
+            iconCache[url]
             return bitmap
         }
+    }
+
+    override fun forceUpdate(user: User): Unit {
+        val base = "http://twilog.org/update.rb"
+
+        val ua = System.getProperty("http.agent")
+        Jsoup.connect(base)
+                .header("User-Agent", ua)
+                .data("id", user.name)
+                .data("kind", "reg")
+                .execute()
     }
 
     fun extractResultByUrl(url: String): Result {
@@ -140,7 +151,6 @@ class HttpTwilogClient : TwilogClient {
                     group.second.map { element -> tweetFromElement(date, element, userDictionary) }
                 }
                 .flatMap { it.toList() }
-                .excludeNullable()
                 .toList()
 
         val hasNext = content.select("ul.nav-link li.nav-next a").count() > 0
