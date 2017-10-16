@@ -161,6 +161,9 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
     }
 
     internal fun onLoad(result: Result): Unit {
+        if (this.activity == null)
+            return
+
         mResult = result
 
         val pref = this.activity.sharedPreferences
@@ -214,20 +217,16 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         })
         condition.text = context.getString(R.string.query_representation_format, condition_text, sort)
 
+        val criteria: TwilogClient.Criteria? = mListener.query.body.map({ null }, { it })
+        mHasNext = criteria != null
+
         val manager = LinearLayoutManager(this.context)
         val adapter = TweetAdapter(this.context, this, result)
         mTweets.layoutManager = manager
         mTweets.adapter = adapter
         mTweets.addOnScrollListener(object : EndlessRecyclerOnScrollListener(manager) {
             override fun onLoadMore(currentPage: Int) {
-                //if (mListener.query.)
-                if (!mHasNext)
-                    return
-
-                val criteria: TwilogClient.Criteria? = mListener.query.body.map({ null }, { it })
-
-                @Suppress("FoldInitializerAndIfToElvis")
-                if (criteria == null)
+                if (criteria == null || !mHasNext)
                     return
 
                 val next = criteria.copy(page = currentPage)
