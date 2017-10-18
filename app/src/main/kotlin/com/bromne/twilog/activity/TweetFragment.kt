@@ -103,7 +103,7 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                 }
                 R.id.change_tweet_order -> {
                     val query = mListener.query
-                    val reversed = TwilogClient.Query(query.userName, query.body, query.order.reversed)
+                    val reversed = query.copy(order = query.order.reversed)
                     mListener.query = reversed
                     loadTweets(mListener.query, true)
                 }
@@ -125,7 +125,7 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
     }
 
     override fun onDateSet(view: DatePicker, year: Int, month: Int, dayOfMonth: Int) {
-        val query = TwilogClient.Query(mListener.query.userName, Either.left(LocalDate(year, month + 1, dayOfMonth)), TwilogClient.Order.DESC)
+        val query = mListener.query.copy(body = Either.left(LocalDate(year, month + 1, dayOfMonth)))
         mListener.openByQuery(query)
     }
 
