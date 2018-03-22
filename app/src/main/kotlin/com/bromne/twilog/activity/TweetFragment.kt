@@ -12,6 +12,7 @@ import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import android.text.Html
 import android.text.method.LinkMovementMethod
+import android.util.Log
 import android.util.LruCache
 import android.view.LayoutInflater
 import android.view.View
@@ -137,12 +138,15 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             }
 
             override fun loadInBackground(publishProgress: (Int) -> Unit): Result {
+                Log.d("Twilog", "loadInBackground")
                 return mListener.client.find(query)
             }
 
             override fun onLoadFinished(result: Result): Unit {
+                Log.d("Twilog", "onLoadFinished")
                 mProgress.visibility = View.INVISIBLE
                 mSwipeRefresh.isRefreshing = false
+                mEmptyMessage.visibility = View.INVISIBLE
                 this@TweetFragment.onLoad(result)
                 if (mTweets.visibility == View.INVISIBLE) {
                     mTweets.visibility = View.VISIBLE
@@ -151,7 +155,9 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             }
 
             override fun onException(e: Exception) {
+                Log.d("Twilog", "onException")
                 mProgress.visibility = View.INVISIBLE
+                mSwipeRefresh.isRefreshing = false
                 mTweets.visibility = View.INVISIBLE
                 Toast.makeText(this@TweetFragment.context, "失敗", Toast.LENGTH_SHORT)
                         .show()
