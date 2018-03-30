@@ -256,147 +256,150 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         })
     }
 
-    class TweetAdapter(val context: Context, val fragment: TweetFragment, var data: Result) : RecyclerView.Adapter<ViewHolder>() {
-        internal val cache: LruCache<String, Bitmap> = LruCache(100)
+    companion object {
+        class TweetAdapter(val context: Context, val fragment: TweetFragment, var data: Result) : RecyclerView.Adapter<ViewHolder>() {
+            internal val cache: LruCache<String, Bitmap> = LruCache(100)
 
-        init {
-            val none = BitmapFactory.decodeResource(this.context.resources, R.drawable.designer_icon)
-            this.cache.put("", none)
-        }
-
-        fun appendTweets(tweets: List<Tweet?>) {
-            this.data = this.data.copy(tweets = this.data.tweets.plus(tweets))
-            notifyDataSetChanged()
-        }
-
-        override fun getItemCount() = this.data.tweets.size + 1
-
-        override fun getItemViewType(position: Int): Int {
-            return when {
-                position < this.data.tweets.size -> TYPE_TWEET
-                else -> TYPE_SENTINEL
+            init {
+                val none = BitmapFactory.decodeResource(this.context.resources, R.drawable.designer_icon)
+                this.cache.put("", none)
             }
-        }
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            return when (viewType) {
-                TYPE_TWEET -> {
-                    val view = LayoutInflater.from(this.context)
-                            .inflate(R.layout.layout_tweet_list_item, parent, false)
-                    val retweetedBy = view.findViewById(R.id.retweeted_by) as TextView
-                    retweetedBy.text = this.context.getString(R.string.retweeted_by, this.data.user.name)
-                    ViewHolder.TweetHolder(view)
-                }
-                else -> {
-                    val view = LayoutInflater.from(this.context)
-                            .inflate(R.layout.layout_tweet_sentinel, parent, false)
-                    ViewHolder.Sentinel(view)
+            fun appendTweets(tweets: List<Tweet?>) {
+                this.data = this.data.copy(tweets = this.data.tweets.plus(tweets))
+                notifyDataSetChanged()
+            }
+
+            override fun getItemCount() = this.data.tweets.size + 1
+
+            override fun getItemViewType(position: Int): Int {
+                return when {
+                    position < this.data.tweets.size -> TYPE_TWEET
+                    else -> TYPE_SENTINEL
                 }
             }
-        }
 
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            when (holder) {
-                is ViewHolder.TweetHolder -> {
-                    val tweet = this.data.tweets[position]
-                    holder.setTweet(this.context, tweet)
+            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+                return when (viewType) {
+                    TYPE_TWEET -> {
+                        val view = LayoutInflater.from(this.context)
+                                .inflate(R.layout.layout_tweet_list_item, parent, false)
+                        val retweetedBy = view.findViewById(R.id.retweeted_by) as TextView
+                        retweetedBy.text = this.context.getString(R.string.retweeted_by, this.data.user.name)
+                        ViewHolder.TweetHolder(view)
+                    }
+                    else -> {
+                        val view = LayoutInflater.from(this.context)
+                                .inflate(R.layout.layout_tweet_sentinel, parent, false)
+                        ViewHolder.Sentinel(view)
+                    }
+                }
+            }
 
-                    if (tweet != null)
-                        holder.itemView.setOnClickListener({ this@TweetAdapter.fragment.mListener.onOpenStatus(tweet) })
-                    else
-                        holder.itemView.setOnClickListener(null)
+            override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+                when (holder) {
+                    is ViewHolder.TweetHolder -> {
+                        val tweet = this.data.tweets[position]
+                        holder.setTweet(this.context, tweet)
 
-                    val key = tweet?.user?.image?.bigger ?: ""
-                    if (this.cache[key] != null) {
-                        holder.icon.setImageBitmap(this.cache[key]!!)
-                    } else {
-                        val callbacks = object : RegularAsyncTask.Callbacks<Bitmap> {
-                            override fun onPreLoad() {
-                                holder.icon.tag = key
-                            }
+                        if (tweet != null)
+                            holder.itemView.setOnClickListener({ this@TweetAdapter.fragment.mListener.onOpenStatus(tweet) })
+                        else
+                            holder.itemView.setOnClickListener(null)
 
-                            override fun loadInBackground(publishProgress: (Int) -> Unit): Bitmap {
-                                return this@TweetAdapter.fragment.mListener.client.loadUserIcon(key)
-                            }
+                        val key = tweet?.user?.image?.bigger ?: ""
+                        if (this.cache[key] != null) {
+                            holder.icon.setImageBitmap(this.cache[key]!!)
+                        } else {
+                            val callbacks = object : RegularAsyncTask.Callbacks<Bitmap> {
+                                override fun onPreLoad() {
+                                    holder.icon.tag = key
+                                }
 
-                            override fun onLoadFinished(result: Bitmap) {
-                                this@TweetAdapter.cache.put(key, result)
-                                if (holder.icon.tag == key) {
-                                    holder.icon.setImageBitmap(result)
+                                override fun loadInBackground(publishProgress: (Int) -> Unit): Bitmap {
+                                    return this@TweetAdapter.fragment.mListener.client.loadUserIcon(key)
+                                }
+
+                                override fun onLoadFinished(result: Bitmap) {
+                                    this@TweetAdapter.cache.put(key, result)
+                                    if (holder.icon.tag == key) {
+                                        holder.icon.setImageBitmap(result)
+                                        holder.icon.startAnimation(R.anim.fade_in_medium)
+                                    }
+                                }
+
+                                override fun onException(e: Exception) {
+                                    holder.icon.setImageResource(R.drawable.designer_icon)
                                     holder.icon.startAnimation(R.anim.fade_in_medium)
                                 }
                             }
 
-                            override fun onException(e: Exception) {
-                                holder.icon.setImageResource(R.drawable.designer_icon)
-                                holder.icon.startAnimation(R.anim.fade_in_medium)
-                            }
+                            this.fragment.imageLoader.loadOrRegister(key, callbacks)
                         }
-
-                        this.fragment.imageLoader.loadOrRegister(key, callbacks)
+                    }
+                    is ViewHolder.Sentinel -> {
+                        holder.setLoading(this.fragment.mHasNext)
                     }
                 }
-                is ViewHolder.Sentinel -> {
-                    holder.setLoading(this.fragment.mHasNext)
+            }
+
+            override fun onViewRecycled(holder: ViewHolder?) {
+                return when (holder) {
+                    is ViewHolder.TweetHolder -> {
+                        holder.icon.setImageResource(0)
+                    }
+                    is ViewHolder.Sentinel -> {}
+                    null -> {}
+                }
+            }
+
+            companion object {
+                val TYPE_TWEET = 1
+                val TYPE_SENTINEL = 2
+            }
+        }
+
+        sealed class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+            class TweetHolder(itemView: View) : ViewHolder(itemView) {
+                val displayName: TextView = itemView.findViewById(R.id.displayName) as TextView
+                val userName: TextView = itemView.findViewById(R.id.userName) as TextView
+                val created: TextView = itemView.findViewById(R.id.created) as TextView
+                val message: TextView = itemView.findViewById(R.id.message) as TextView
+                val retweet: RelativeLayout = itemView.findViewById(R.id.retweet) as RelativeLayout
+                val icon: ImageView = itemView.findViewById(R.id.icon) as ImageView
+
+                init {
+                    this.message.movementMethod = LinkMovementMethod.getInstance()
+                }
+
+                fun setTweet(context: Context, tweet: Tweet?): Unit {
+                    this.userName.text = if (tweet != null) context.getString(R.string.format_username, tweet.user.name) else ""
+                    this.displayName.text = tweet?.user?.display ?: context.getString(R.string.refusal)
+                    this.created.text = tweet?.created?.toString(context.getString(R.string.format_date)) ?: ""
+                    this.message.text = if (tweet != null) Html.fromHtml(tweet.raw) else ""
+
+                    this.retweet.visibility = if (tweet != null && tweet.isRetweet) RelativeLayout.VISIBLE else RelativeLayout.GONE
+                }
+            }
+
+            class Sentinel(itemView: View) : ViewHolder(itemView) {
+                val progress: ProgressBar = itemView.findViewById(R.id.progress) as ProgressBar
+                val sentinel: ImageView = itemView.findViewById(R.id.sentinel) as ImageView
+
+                fun setLoading(loading: Boolean): Unit {
+                    this.progress.visibility = if (loading) View.VISIBLE else View.INVISIBLE
+                    this.sentinel.visibility = if (loading) View.INVISIBLE else View.VISIBLE
                 }
             }
         }
 
-        override fun onViewRecycled(holder: ViewHolder?) {
-            return when (holder) {
-                is ViewHolder.TweetHolder -> {
-                    holder.icon.setImageResource(0)
-                }
-                is TweetFragment.ViewHolder.Sentinel -> {}
-                null -> {}
-            }
+        interface OnTweetFragmentInteractionListener {
+            var query: TwilogClient.Query
+            var client: TwilogClient
+
+            fun onOpenStatus(tweet: Tweet): Unit
+            fun openByQuery(query: TwilogClient.Query): Unit
         }
-
-        companion object {
-            val TYPE_TWEET = 1
-            val TYPE_SENTINEL = 2
-        }
-    }
-
-    sealed class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        class TweetHolder(itemView: View) : ViewHolder(itemView) {
-            val displayName: TextView = itemView.findViewById(R.id.displayName) as TextView
-            val userName: TextView = itemView.findViewById(R.id.userName) as TextView
-            val created: TextView = itemView.findViewById(R.id.created) as TextView
-            val message: TextView = itemView.findViewById(R.id.message) as TextView
-            val retweet: RelativeLayout = itemView.findViewById(R.id.retweet) as RelativeLayout
-            val icon: ImageView = itemView.findViewById(R.id.icon) as ImageView
-
-            init {
-                this.message.movementMethod = LinkMovementMethod.getInstance()
-            }
-
-            fun setTweet(context: Context, tweet: Tweet?): Unit {
-                this.userName.text = if (tweet != null) context.getString(R.string.format_username, tweet.user.name) else ""
-                this.displayName.text = tweet?.user?.display ?: context.getString(R.string.refusal)
-                this.created.text = tweet?.created?.toString(context.getString(R.string.format_date)) ?: ""
-                this.message.text = if (tweet != null) Html.fromHtml(tweet.raw) else ""
-
-                this.retweet.visibility = if (tweet != null && tweet.isRetweet) RelativeLayout.VISIBLE else RelativeLayout.GONE
-            }
-        }
-
-        class Sentinel(itemView: View) : ViewHolder(itemView) {
-            val progress: ProgressBar = itemView.findViewById(R.id.progress) as ProgressBar
-            val sentinel: ImageView = itemView.findViewById(R.id.sentinel) as ImageView
-
-            fun setLoading(loading: Boolean): Unit {
-                this.progress.visibility = if (loading) View.VISIBLE else View.INVISIBLE
-                this.sentinel.visibility = if (loading) View.INVISIBLE else View.VISIBLE
-            }
-        }
-    }
-
-    interface OnTweetFragmentInteractionListener {
-        var query: TwilogClient.Query
-        var client: TwilogClient
-
-        fun onOpenStatus(tweet: Tweet): Unit
-        fun openByQuery(query: TwilogClient.Query): Unit
     }
 }
+
