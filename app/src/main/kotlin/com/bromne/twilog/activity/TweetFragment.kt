@@ -308,6 +308,7 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                             holder.itemView.setOnClickListener(null)
 
                         val key = tweet?.user?.image?.bigger ?: ""
+                        // TODO: 「none」が消えていた場合の処理
                         if (this.cache[key] != null) {
                             holder.icon.setImageBitmap(this.cache[key]!!)
                         } else {
@@ -343,13 +344,12 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                 }
             }
 
-            override fun onViewRecycled(holder: ViewHolder?) {
+            override fun onViewRecycled(holder: ViewHolder) {
                 return when (holder) {
                     is ViewHolder.TweetHolder -> {
                         holder.icon.setImageResource(0)
                     }
                     is ViewHolder.Sentinel -> {}
-                    null -> {}
                 }
             }
 

@@ -17,7 +17,7 @@ import com.bromne.twilog.app.history
 import com.bromne.twilog.app.sharedPreferences
 import com.bromne.twilog.client.TwilogClient
 
-class HomeActivity : AppCompatActivity(), UserSearchFragment.Listener, HistoryFragment.Listener {
+class HomeActivity : AppCompatActivity(), UserSearchFragment.Listener, HistoryFragment.Companion.Listener {
     lateinit internal var mSectionsPagerAdapter: SectionsPagerAdapter
 
     lateinit internal var mViewPager: ViewPager

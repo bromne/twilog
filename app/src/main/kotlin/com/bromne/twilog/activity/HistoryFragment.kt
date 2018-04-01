@@ -32,19 +32,15 @@ class HistoryFragment : Fragment() {
     lateinit var mListener: Listener
     lateinit var mList: RecyclerView
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        mModel = ViewModelProviders.of(this).get(HistoryViewModel::class.java)
-        mModel.queries.value = mListener.findHistory()
-    }
-
     override fun onAttach(context: Context?) {
         super.onAttach(context)
         mListener = context as Listener
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        mModel = ViewModelProviders.of(this).get(HistoryViewModel::class.java)
+        mModel.queries.value = mListener.findHistory()
+
         val root = inflater.inflate(R.layout.fragment_history, container, false)
         mList = root.findViewById(R.id.list)
         return root
@@ -69,82 +65,80 @@ class HistoryFragment : Fragment() {
         class HistoryViewModel : ViewModel() {
             val queries: MutableLiveData<List<SavedQuery>> = MutableLiveData()
         }
-    }
 
-    interface Listener {
-        fun findHistory(): List<SavedQuery>
-    }
-
-    class HistoryAdapter(val fragment: HistoryFragment) : RecyclerView.Adapter<HistoryHolder>() {
-        var items: List<SavedQuery> = emptyList()
-            set(value) {
-                field = value
-                notifyDataSetChanged()
-            }
-
-        internal val cache: LruCache<String, Bitmap> = LruCache(100)
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryHolder {
-            return HistoryHolder.of(parent, false)
+        interface Listener {
+            fun findHistory(): List<SavedQuery>
         }
 
-        override fun onBindViewHolder(holder: HistoryHolder, position: Int) {
-            val item = this.items[position]
+        class HistoryAdapter(val fragment: HistoryFragment) : RecyclerView.Adapter<HistoryHolder>() {
+            var items: List<SavedQuery> = emptyList()
+                set(value) {
+                    field = value
+                    notifyDataSetChanged()
+                }
 
-            holder.setQuery(item)
+            internal val cache: LruCache<String, Bitmap> = LruCache(100)
 
-            val key = "default"
-            val restored = this.cache[key]
-            if (restored != null) {
-                holder.icon.setImageBitmap(restored)
-            } else {
-                this.fragment.imageLoader.loadOrRegister(key, object : RegularAsyncTask.Callbacks<Bitmap> {
-                    override fun onPreLoad() {
-                        holder.icon.tag = key
-                    }
+            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryHolder {
+                return HistoryHolder.of(parent, false)
+            }
 
-                    override fun loadInBackground(publishProgress: (Int) -> Unit): Bitmap {
-                        return BitmapFactory.decodeResource(this@HistoryAdapter.fragment.context.resources, R.drawable.designer_icon)
-                    }
+            override fun onBindViewHolder(holder: HistoryHolder, position: Int) {
+                val item = this.items[position]
 
-                    override fun onLoadFinished(result: Bitmap) {
-                        this@HistoryAdapter.cache.put(key, result)
-                        if (holder.icon.tag == key) {
-                            holder.icon.setImageBitmap(result)
-                            holder.icon.startAnimation(R.anim.fade_in_medium)
+                holder.setQuery(item)
+
+                val key = "default"
+                val restored = this.cache[key]
+                if (restored != null) {
+                    holder.icon.setImageBitmap(restored)
+                } else {
+                    this.fragment.imageLoader.loadOrRegister(key, object : RegularAsyncTask.Callbacks<Bitmap> {
+                        override fun onPreLoad() {
+                            holder.icon.tag = key
                         }
-                    }
 
-                    override fun onException(e: Exception) {
+                        override fun loadInBackground(publishProgress: (Int) -> Unit): Bitmap {
+                            return BitmapFactory.decodeResource(this@HistoryAdapter.fragment.context.resources, R.drawable.designer_icon)
+                        }
+
+                        override fun onLoadFinished(result: Bitmap) {
+                            this@HistoryAdapter.cache.put(key, result)
+                            if (holder.icon.tag == key) {
+                                holder.icon.setImageBitmap(result)
+                                holder.icon.startAnimation(R.anim.fade_in_medium)
+                            }
+                        }
+
+                        override fun onException(e: Exception) {
 //                        holder.icon.setImageResource(R.drawable.designer_icon)
 //                        holder.icon.startAnimation(R.anim.fade_in_medium)
-                    }
-                })
+                        }
+                    })
+                }
+                holder.icon
             }
-            holder.icon
+
+            override fun getItemCount() = this.items.size
         }
 
-        override fun getItemCount() = this.items.size
-    }
+        class HistoryHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+            val context: Context = itemView.context
+            val icon: ImageView = itemView.findViewById(R.id.icon)
+//            val displayName: TextView = itemView.findViewById(R.id.displayName)
+            val userName: TextView = itemView.findViewById(R.id.userName)
 
-    class HistoryHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val context: Context = itemView.context
-        val icon: ImageView = itemView.findViewById(R.id.icon)
-        val displayName: TextView = itemView.findViewById(R.id.displayName)
-        val userName: TextView = itemView.findViewById(R.id.userName)
+            fun setQuery(query: SavedQuery): Unit {
+                this.userName.text = this.context.resources.getString(R.string.format_username, query.query.userName)
+            }
 
-        fun setQuery(query: SavedQuery): Unit {
-            this.userName.text = this.context.resources.getString(R.string.format_username, query.query.userName)
-        }
-
-        companion object {
-            fun of(parent :ViewGroup, attachToRoot: Boolean): HistoryHolder {
-                return parent.context.layoutInflater
-                        .inflate(R.layout.layout_saved_query_user, parent, attachToRoot)
-                        .let(::HistoryHolder)
+            companion object {
+                fun of(parent :ViewGroup, attachToRoot: Boolean): HistoryHolder {
+                    return parent.context.layoutInflater
+                            .inflate(R.layout.layout_saved_query_user, parent, attachToRoot)
+                            .let(::HistoryHolder)
+                }
             }
         }
     }
-
-
 }
