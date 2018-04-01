@@ -1,5 +1,6 @@
 package com.bromne.twilog.activity
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
@@ -26,13 +27,13 @@ class SearchDialog : DialogFragment() {
     override fun onAttach(context: Context?) {
         super.onAttach(context)
 
-        this.criteria = this.arguments.getSerializable(KEY_CRITERA) as TwilogClient.Criteria
+        this.criteria = this.arguments!!.getSerializable(KEY_CRITERA) as TwilogClient.Criteria
     }
 
+    @SuppressLint("InflateParams")
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val layout = LayoutInflater.from(this.activity)
                 .inflate(R.layout.dialog_search, null, false)
-
         this.keyword = layout.findViewById(R.id.keyword)
         this.junction = layout.findViewById(R.id.junction)
         this.search = layout.findViewById(R.id.search_button)

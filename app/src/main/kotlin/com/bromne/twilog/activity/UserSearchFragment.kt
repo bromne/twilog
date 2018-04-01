@@ -20,8 +20,8 @@ class UserSearchFragment : Fragment() {
     internal lateinit var mUserName: EditText
     internal lateinit var mMove: Button
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val root = inflater!!.inflate(R.layout.fragment_user_search, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val root = inflater.inflate(R.layout.fragment_user_search, container, false)
         mUserName = root.findViewById(R.id.name)
         mMove = root.findViewById(R.id.move)
 

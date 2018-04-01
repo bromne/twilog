@@ -46,7 +46,7 @@ class HistoryFragment : Fragment() {
         return root
     }
 
-    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         val historyAdapter = HistoryAdapter(this)
@@ -99,7 +99,7 @@ class HistoryFragment : Fragment() {
                         }
 
                         override fun loadInBackground(publishProgress: (Int) -> Unit): Bitmap {
-                            return BitmapFactory.decodeResource(this@HistoryAdapter.fragment.context.resources, R.drawable.designer_icon)
+                            return BitmapFactory.decodeResource(this@HistoryAdapter.fragment.context!!.resources, R.drawable.designer_icon)
                         }
 
                         override fun onLoadFinished(result: Bitmap) {

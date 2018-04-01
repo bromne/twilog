@@ -56,12 +56,8 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
 
     var mHasNext: Boolean = true
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val root = inflater!!.inflate(R.layout.fragment_tweet_list, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val root = inflater.inflate(R.layout.fragment_tweet_list, container, false)
 
         mWrapper = root.findViewById(R.id.wrapper)
         mHeader = root.findViewById(R.id.header)
@@ -167,12 +163,10 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
     }
 
     internal fun onLoad(result: Result): Unit {
-        if (this.activity == null)
-            return
+        val activity = this.activity ?: return
 
         mResult = result
-
-        val pref = this.activity.sharedPreferences
+        val pref = activity.sharedPreferences
         pref.history = pref.history.toBuilder()
                 .add(SavedQuery(this.mListener.query, DateTime.now()))
                 .build()
@@ -213,21 +207,21 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                 R.string.fontawesome_clock_o
         } , {
             R.string.fontawesome_search
-        }).let { context.getString(it) }
+        }).let { getString(it) }
 
-        val sort = (if (mListener.query.order == TwilogClient.Order.ASC) R.string.ascending else R.string.descending).let { context.getString(it) }
+        val sort = (if (mListener.query.order == TwilogClient.Order.ASC) R.string.ascending else R.string.descending).let { getString(it) }
         val condition_text = mListener.query.body.map({
-            it?.toString(context.getString(R.string.date_format_with_day)) ?: context.getString(R.string.recent_tweets)
+            it?.toString(getString(R.string.date_format_with_day)) ?: getString(R.string.recent_tweets)
         }, {
             "\""+ it.keyword + "\""
         })
-        condition.text = context.getString(R.string.query_representation_format, condition_text, sort)
+        condition.text = getString(R.string.query_representation_format, condition_text, sort)
 
         val criteria: TwilogClient.Criteria? = mListener.query.body.map({ null }, { it })
         mHasNext = criteria != null
 
         val manager = LinearLayoutManager(this.context)
-        val adapter = TweetAdapter(this.context, this, result)
+        val adapter = TweetAdapter(activity, this, result)
         mTweets.layoutManager = manager
         mTweets.adapter = adapter
         mTweets.addOnScrollListener(object : EndlessRecyclerOnScrollListener(manager) {

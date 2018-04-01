@@ -63,9 +63,9 @@ class HomeActivity : AppCompatActivity(), UserSearchFragment.Listener, HistoryFr
     override fun findHistory(): List<SavedQuery> = this.sharedPreferences.history.toList()
 
     class PlaceholderFragment : Fragment() {
-        override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
+        override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                 savedInstanceState: Bundle?): View? {
-            val rootView = inflater!!.inflate(R.layout.fragment_home, container, false)
+            val rootView = inflater.inflate(R.layout.fragment_home, container, false)
             return rootView
         }
 
