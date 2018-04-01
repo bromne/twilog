@@ -372,6 +372,7 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                     this.message.movementMethod = LinkMovementMethod.getInstance()
                 }
 
+                @Suppress("DEPRECATION")
                 fun setTweet(context: Context, tweet: Tweet?): Unit {
                     this.userName.text = if (tweet != null) context.getString(R.string.format_username, tweet.user.name) else ""
                     this.displayName.text = tweet?.user?.display ?: context.getString(R.string.refusal)
