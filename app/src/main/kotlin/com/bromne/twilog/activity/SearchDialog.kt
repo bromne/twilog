@@ -33,10 +33,10 @@ class SearchDialog : DialogFragment() {
         val layout = LayoutInflater.from(this.activity)
                 .inflate(R.layout.dialog_search, null, false)
 
-        this.keyword = layout.findViewById(R.id.keyword) as EditText
-        this.junction = layout.findViewById(R.id.junction) as RadioGroup
-        this.search = layout.findViewById(R.id.search_button) as Button
-        this.cancel = layout.findViewById(R.id.cancel_button) as Button
+        this.keyword = layout.findViewById(R.id.keyword)
+        this.junction = layout.findViewById(R.id.junction)
+        this.search = layout.findViewById(R.id.search_button)
+        this.cancel = layout.findViewById(R.id.cancel_button)
 
         this.keyword.setOnEditorActionListener({v, actionId, e ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {

@@ -65,9 +65,9 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
 
         mWrapper = root.findViewById(R.id.wrapper)
         mHeader = root.findViewById(R.id.header)
-        mSwipeRefresh = root.findViewById(R.id.refresh) as SwipeRefreshLayout
-        mTweets = root.findViewById(R.id.list) as RecyclerView
-        mProgress = root.findViewById(R.id.progress) as ProgressBar
+        mSwipeRefresh = root.findViewById(R.id.refresh)
+        mTweets = root.findViewById(R.id.list)
+        mProgress = root.findViewById(R.id.progress)
         mEmptyMessage = root.findViewById(R.id.no_items)
 
         mSwipeRefresh.setOnRefreshListener({
@@ -87,7 +87,7 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             }
         })
 
-        mToolbar = root.findViewById(R.id.toolbar) as Toolbar
+        mToolbar = root.findViewById(R.id.toolbar)
         mToolbar.inflateMenu(R.menu.menu_main)
         mToolbar.setOnMenuItemClickListener({
             val date: LocalDate = mListener.query.body.map({ it }, { null }) ?: LocalDate.now()
@@ -177,11 +177,11 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                 .add(SavedQuery(this.mListener.query, DateTime.now()))
                 .build()
 
-        val icon = mHeader.findViewById(R.id.icon) as ImageView
-        val displayName = mHeader.findViewById(R.id.displayName) as TextView
-        val userName = mHeader.findViewById(R.id.userName) as TextView
-        val functionIcon = mHeader.findViewById(R.id.function_icon) as TextView
-        val condition = mHeader.findViewById(R.id.condition) as TextView
+        val icon: ImageView = mHeader.findViewById(R.id.icon)
+        val displayName: TextView = mHeader.findViewById(R.id.displayName)
+        val userName: TextView = mHeader.findViewById(R.id.userName)
+        val functionIcon: TextView = mHeader.findViewById(R.id.function_icon)
+        val condition: TextView = mHeader.findViewById(R.id.condition)
 
         this.imageLoader.loadOrRegister(result.user.image.bigger, object : RegularAsyncTask.Callbacks<Bitmap> {
             override fun loadInBackground(publishProgress: (Int) -> Unit): Bitmap {
@@ -284,7 +284,7 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                     TYPE_TWEET -> {
                         val view = LayoutInflater.from(this.context)
                                 .inflate(R.layout.layout_tweet_list_item, parent, false)
-                        val retweetedBy = view.findViewById(R.id.retweeted_by) as TextView
+                        val retweetedBy: TextView = view.findViewById(R.id.retweeted_by)
                         retweetedBy.text = this.context.getString(R.string.retweeted_by, this.data.user.name)
                         ViewHolder.TweetHolder(view)
                     }
@@ -361,12 +361,12 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
 
         sealed class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             class TweetHolder(itemView: View) : ViewHolder(itemView) {
-                val displayName: TextView = itemView.findViewById(R.id.displayName) as TextView
-                val userName: TextView = itemView.findViewById(R.id.userName) as TextView
-                val created: TextView = itemView.findViewById(R.id.created) as TextView
-                val message: TextView = itemView.findViewById(R.id.message) as TextView
-                val retweet: RelativeLayout = itemView.findViewById(R.id.retweet) as RelativeLayout
-                val icon: ImageView = itemView.findViewById(R.id.icon) as ImageView
+                val displayName: TextView = itemView.findViewById(R.id.displayName)
+                val userName: TextView = itemView.findViewById(R.id.userName)
+                val created: TextView = itemView.findViewById(R.id.created)
+                val message: TextView = itemView.findViewById(R.id.message)
+                val retweet: RelativeLayout = itemView.findViewById(R.id.retweet)
+                val icon: ImageView = itemView.findViewById(R.id.icon)
 
                 init {
                     this.message.movementMethod = LinkMovementMethod.getInstance()
@@ -383,8 +383,8 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             }
 
             class Sentinel(itemView: View) : ViewHolder(itemView) {
-                val progress: ProgressBar = itemView.findViewById(R.id.progress) as ProgressBar
-                val sentinel: ImageView = itemView.findViewById(R.id.sentinel) as ImageView
+                val progress: ProgressBar = itemView.findViewById(R.id.progress)
+                val sentinel: ImageView = itemView.findViewById(R.id.sentinel)
 
                 fun setLoading(loading: Boolean): Unit {
                     this.progress.visibility = if (loading) View.VISIBLE else View.INVISIBLE

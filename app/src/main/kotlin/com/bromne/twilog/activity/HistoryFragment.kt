@@ -1,5 +1,9 @@
 package com.bromne.twilog.activity
 
+import android.arch.lifecycle.MutableLiveData
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModel
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -21,6 +25,8 @@ import com.bromne.twilog.R
 import com.bromne.twilog.app.SavedQuery
 
 class HistoryFragment : Fragment() {
+    lateinit var mModel: HistoryViewModel
+
     val imageLoader: ParallelAsyncLoader<String, Bitmap> = ParallelAsyncLoader()
 
     lateinit var mListener: Listener
@@ -28,6 +34,9 @@ class HistoryFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        mModel = ViewModelProviders.of(this).get(HistoryViewModel::class.java)
+        mModel.queries.value = mListener.findHistory()
     }
 
     override fun onAttach(context: Context?) {
@@ -37,20 +46,28 @@ class HistoryFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val root = inflater.inflate(R.layout.fragment_history, container, false)
-        mList = root.findViewById(R.id.list) as RecyclerView
+        mList = root.findViewById(R.id.list)
         return root
     }
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val historyAdapter = HistoryAdapter(this)
         mList.layoutManager = LinearLayoutManager(this.context)
-        mList.adapter = HistoryAdapter(this, { mListener.findHistory() })
+        mList.adapter = historyAdapter
+        mModel.queries.observe(this, Observer {
+            items -> historyAdapter.items = items!!
+        })
     }
 
     companion object {
         fun newInstance(): HistoryFragment {
             return HistoryFragment()
+        }
+
+        class HistoryViewModel : ViewModel() {
+            val queries: MutableLiveData<List<SavedQuery>> = MutableLiveData()
         }
     }
 
@@ -58,7 +75,13 @@ class HistoryFragment : Fragment() {
         fun findHistory(): List<SavedQuery>
     }
 
-    class HistoryAdapter(val fragment: HistoryFragment, val items: () -> List<SavedQuery>) : RecyclerView.Adapter<HistoryHolder>() {
+    class HistoryAdapter(val fragment: HistoryFragment) : RecyclerView.Adapter<HistoryHolder>() {
+        var items: List<SavedQuery> = emptyList()
+            set(value) {
+                field = value
+                notifyDataSetChanged()
+            }
+
         internal val cache: LruCache<String, Bitmap> = LruCache(100)
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryHolder {
@@ -66,7 +89,7 @@ class HistoryFragment : Fragment() {
         }
 
         override fun onBindViewHolder(holder: HistoryHolder, position: Int) {
-            val item = this.items()[position]
+            val item = this.items[position]
 
             holder.setQuery(item)
 
@@ -101,13 +124,14 @@ class HistoryFragment : Fragment() {
             holder.icon
         }
 
-        override fun getItemCount() = this.items().size
+        override fun getItemCount() = this.items.size
     }
+
     class HistoryHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val context: Context = itemView.context
-        val icon = itemView.findViewById(R.id.icon) as ImageView
-        val displayName = itemView.findViewById(R.id.displayName) as TextView
-        val userName = itemView.findViewById(R.id.userName) as TextView
+        val icon: ImageView = itemView.findViewById(R.id.icon)
+        val displayName: TextView = itemView.findViewById(R.id.displayName)
+        val userName: TextView = itemView.findViewById(R.id.userName)
 
         fun setQuery(query: SavedQuery): Unit {
             this.userName.text = this.context.resources.getString(R.string.format_username, query.query.userName)

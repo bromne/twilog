@@ -22,8 +22,8 @@ class UserSearchFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val root = inflater!!.inflate(R.layout.fragment_user_search, container, false)
-        mUserName = root.findViewById(R.id.name) as EditText
-        mMove = root.findViewById(R.id.move) as Button
+        mUserName = root.findViewById(R.id.name)
+        mMove = root.findViewById(R.id.move)
 
         mUserName.setOnEditorActionListener { sender, actionId, event ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {

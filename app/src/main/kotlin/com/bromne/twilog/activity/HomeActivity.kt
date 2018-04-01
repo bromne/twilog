@@ -25,12 +25,12 @@ class HomeActivity : AppCompatActivity(), UserSearchFragment.Listener, HistoryFr
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
-        val toolbar = findViewById(R.id.toolbar) as Toolbar
+        val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
         mSectionsPagerAdapter = SectionsPagerAdapter(this)
 
-        mViewPager = findViewById(R.id.container) as ViewPager
+        mViewPager = findViewById(R.id.container)
         mViewPager.adapter = mSectionsPagerAdapter
 
         val onPageChange = object : ViewPager.OnPageChangeListener {
@@ -52,7 +52,7 @@ class HomeActivity : AppCompatActivity(), UserSearchFragment.Listener, HistoryFr
         mViewPager.addOnPageChangeListener(onPageChange)
         onPageChange.onPageSelected(mViewPager.currentItem)
 
-        val tabLayout = findViewById(R.id.tabs) as TabLayout
+        val tabLayout: TabLayout = findViewById(R.id.tabs)
         tabLayout.setupWithViewPager(mViewPager)
     }
 

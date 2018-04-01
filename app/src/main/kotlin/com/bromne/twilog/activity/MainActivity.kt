@@ -12,8 +12,8 @@ import com.bromne.twilog.client.HttpTwilogClient
 import com.bromne.twilog.client.Tweet
 import com.bromne.twilog.client.TwilogClient
 
-class MainActivity() : AppCompatActivity(),
-        TweetFragment.OnTweetFragmentInteractionListener {
+class MainActivity : AppCompatActivity(),
+        TweetFragment.Companion.OnTweetFragmentInteractionListener {
 
     lateinit override var query: TwilogClient.Query
 
