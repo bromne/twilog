@@ -11,8 +11,6 @@ import java.util.regex.Pattern
 interface TwilogClient {
     fun find(query :Query): Result
 
-    fun loadUserIcon(url: String): Bitmap
-
     fun forceUpdate(user: User): Unit
 
     data class Query(val userName: String, val body: Either<LocalDate?, Criteria>, val order: Order) : Serializable

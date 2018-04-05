@@ -8,8 +8,8 @@
     android:layout_height="wrap_content">
 
     <ImageView
-        android:layout_width="@dimen/icon_side_length_mini"
-        android:layout_height="@dimen/icon_side_length_mini"
+        android:layout_width="@dimen/icon_side_length"
+        android:layout_height="@dimen/icon_side_length"
         android:id="@+id/icon"
         android:contentDescription="@string/icon"
         tools:src="@drawable/designer_icon"

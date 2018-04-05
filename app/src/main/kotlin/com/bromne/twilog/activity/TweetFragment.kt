@@ -2,8 +2,6 @@ package com.bromne.twilog.activity
 
 import android.app.DatePickerDialog
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.widget.SwipeRefreshLayout
@@ -13,7 +11,6 @@ import android.support.v7.widget.Toolbar
 import android.text.Html
 import android.text.method.LinkMovementMethod
 import android.util.Log
-import android.util.LruCache
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,13 +20,13 @@ import android.widget.ProgressBar
 import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
-import com.bromne.stereotypes.async.ParallelAsyncLoader
 import com.bromne.stereotypes.async.RegularAsyncTask
 import com.bromne.stereotypes.data.Either
 import com.bromne.stereotypes.data.toBuilder
 import com.bromne.stereotypes.view.startAnimation
 import com.bromne.twilog.R
 import com.bromne.twilog.app.SavedQuery
+import com.bromne.twilog.app.ViewExtensions.load
 import com.bromne.twilog.app.history
 import com.bromne.twilog.app.sharedPreferences
 import com.bromne.twilog.client.Result
@@ -40,8 +37,6 @@ import org.joda.time.DateTime
 import org.joda.time.LocalDate
 
 class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
-    val imageLoader: ParallelAsyncLoader<String, Bitmap> = ParallelAsyncLoader()
-
     internal var mResult: Result? = null
 
     lateinit internal var mListener: OnTweetFragmentInteractionListener
@@ -177,26 +172,7 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         val functionIcon: TextView = mHeader.findViewById(R.id.function_icon)
         val condition: TextView = mHeader.findViewById(R.id.condition)
 
-        this.imageLoader.loadOrRegister(result.user.image.bigger, object : RegularAsyncTask.Callbacks<Bitmap> {
-            override fun loadInBackground(publishProgress: (Int) -> Unit): Bitmap {
-                return mListener.client.loadUserIcon(result.user.image.bigger)
-            }
-
-            @Suppress("NAME_SHADOWING")
-            override fun onLoadFinished(result: Bitmap) {
-                if (icon.drawable == null) {
-                    icon.startAnimation(R.anim.fade_in_medium)
-                }
-                icon.setImageBitmap(result)
-            }
-
-            override fun onException(e: Exception) {
-                if (icon.drawable == null) {
-                    icon.startAnimation(R.anim.fade_in_medium)
-                }
-                icon.setImageResource(R.drawable.designer_icon)
-            }
-        })
+        icon.load(result.user.image.bigger)
         displayName.text = result.user.display
         userName.text = String.format(getString(R.string.format_username), result.user.name)
 
@@ -221,7 +197,7 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         mHasNext = criteria != null
 
         val manager = LinearLayoutManager(this.context)
-        val adapter = TweetAdapter(activity, this, result)
+        val adapter = TweetAdapter(this, result)
         mTweets.layoutManager = manager
         mTweets.adapter = adapter
         mTweets.addOnScrollListener(object : EndlessRecyclerOnScrollListener(manager) {
@@ -251,14 +227,8 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
     }
 
     companion object {
-        class TweetAdapter(val context: Context, val fragment: TweetFragment, var data: Result) : RecyclerView.Adapter<ViewHolder>() {
-            internal val cache: LruCache<String, Bitmap> = LruCache(100)
-
-            init {
-                val none = BitmapFactory.decodeResource(this.context.resources, R.drawable.designer_icon)
-                this.cache.put("", none)
-            }
-
+        class TweetAdapter(val fragment: TweetFragment, var data: Result) : RecyclerView.Adapter<ViewHolder>() {
+            val context = fragment.context!!
             fun appendTweets(tweets: List<Tweet?>) {
                 this.data = this.data.copy(tweets = this.data.tweets.plus(tweets))
                 notifyDataSetChanged()
@@ -294,43 +264,7 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                 when (holder) {
                     is ViewHolder.TweetHolder -> {
                         val tweet = this.data.tweets[position]
-                        holder.setTweet(this.context, tweet)
-
-                        if (tweet != null)
-                            holder.itemView.setOnClickListener({ this@TweetAdapter.fragment.mListener.onOpenStatus(tweet) })
-                        else
-                            holder.itemView.setOnClickListener(null)
-
-                        val key = tweet?.user?.image?.bigger ?: ""
-                        // TODO: 「none」が消えていた場合の処理
-                        if (this.cache[key] != null) {
-                            holder.icon.setImageBitmap(this.cache[key]!!)
-                        } else {
-                            val callbacks = object : RegularAsyncTask.Callbacks<Bitmap> {
-                                override fun onPreLoad() {
-                                    holder.icon.tag = key
-                                }
-
-                                override fun loadInBackground(publishProgress: (Int) -> Unit): Bitmap {
-                                    return this@TweetAdapter.fragment.mListener.client.loadUserIcon(key)
-                                }
-
-                                override fun onLoadFinished(result: Bitmap) {
-                                    this@TweetAdapter.cache.put(key, result)
-                                    if (holder.icon.tag == key) {
-                                        holder.icon.setImageBitmap(result)
-                                        holder.icon.startAnimation(R.anim.fade_in_medium)
-                                    }
-                                }
-
-                                override fun onException(e: Exception) {
-                                    holder.icon.setImageResource(R.drawable.designer_icon)
-                                    holder.icon.startAnimation(R.anim.fade_in_medium)
-                                }
-                            }
-
-                            this.fragment.imageLoader.loadOrRegister(key, callbacks)
-                        }
+                        holder.setTweet(tweet, this.fragment)
                     }
                     is ViewHolder.Sentinel -> {
                         holder.setLoading(this.fragment.mHasNext)
@@ -367,13 +301,20 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                 }
 
                 @Suppress("DEPRECATION")
-                fun setTweet(context: Context, tweet: Tweet?): Unit {
-                    this.userName.text = if (tweet != null) context.getString(R.string.format_username, tweet.user.name) else ""
-                    this.displayName.text = tweet?.user?.display ?: context.getString(R.string.refusal)
-                    this.created.text = tweet?.created?.toString(context.getString(R.string.format_date)) ?: ""
+                fun setTweet(tweet: Tweet?, fragment: TweetFragment): Unit {
+                    this.userName.text = if (tweet != null) fragment.getString(R.string.format_username, tweet.user.name) else ""
+                    this.displayName.text = tweet?.user?.display ?: fragment.getString(R.string.refusal)
+                    this.created.text = tweet?.created?.toString(fragment.getString(R.string.format_date)) ?: ""
                     this.message.text = if (tweet != null) Html.fromHtml(tweet.raw) else ""
-
                     this.retweet.visibility = if (tweet != null && tweet.isRetweet) RelativeLayout.VISIBLE else RelativeLayout.GONE
+
+                    if (tweet != null) {
+                        this.icon.load(tweet.user.image.bigger)
+                        this.itemView.setOnClickListener({ fragment.mListener.onOpenStatus(tweet) })
+                    } else {
+                        this.icon.setImageResource(R.drawable.designer_icon)
+                        this.itemView.setOnClickListener(null)
+                    }
                 }
             }
 

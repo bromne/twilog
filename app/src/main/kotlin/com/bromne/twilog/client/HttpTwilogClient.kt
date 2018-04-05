@@ -41,16 +41,6 @@ class HttpTwilogClient : TwilogClient {
         return extractResultByUrl(url)
     }
 
-    override fun loadUserIcon(url: String): Bitmap {
-        if (this.iconCache.contains(url)) {
-            return iconCache[url]!!
-        } else {
-            val bitmap = BitmapFactory.decodeStream(URL(url).openStream())
-            iconCache[url]
-            return bitmap
-        }
-    }
-
     override fun forceUpdate(user: User): Unit {
         val base = "http://twilog.org/update.rb"
 
