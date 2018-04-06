@@ -135,7 +135,7 @@ class HistoryFragment : Fragment() {
             companion object {
                 fun of(parent :ViewGroup, attachToRoot: Boolean): HistoryHolder {
                     return parent.context.layoutInflater
-                            .inflate(R.layout.layout_saved_query_user, parent, attachToRoot)
+                            .inflate(R.layout.layout_saved_user, parent, attachToRoot)
                             .let(::HistoryHolder)
                 }
             }

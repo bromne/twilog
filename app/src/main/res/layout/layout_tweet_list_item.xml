@@ -41,7 +41,6 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 tools:text="Jane Doe"
-                android:text="@{tweet.message, default=`Jane Doe`}"
                 android:layout_toEndOf="@id/icon"
                 android:textColor="@android:color/primary_text_light"
                 android:textStyle="bold" />
