@@ -1,12 +1,14 @@
 package com.bromne.twilog.client
 
 import org.joda.time.LocalDateTime
+import java.io.Serializable
 import java.text.MessageFormat
 import java.util.regex.Pattern
 
 data class Tweet(val status: String, val user: User, val created: LocalDateTime, val message: String, val raw: String, val isRetweet: Boolean) {
-    val id :Long = this.status.extractWithPattern(Tweet.idPattern)
+    val id: Long = this.status.extractWithPattern(Tweet.idPattern)
             .let { java.lang.Long.parseLong(it) }
+
     override fun toString(): String = MessageFormat.format("[{0} {1}] {2}", this.created.toString("yyyy-MM-dd HH:mm:ss"), this.user.name, this.message)
 
     companion object {
@@ -14,13 +16,13 @@ data class Tweet(val status: String, val user: User, val created: LocalDateTime,
     }
 }
 
-data class User(val name: String, val display: String, val image: UserImage)
+data class User(val name: String, val display: String, val image: UserImage) : Serializable
 
-data class UserImage(val base: String, val extension: String) {
-    val original = this.base + this.extension
-    val bigger = this.base + "_bigger" + this.extension
-    val normal = this.base + "_normal" + this.extension
-    val mini = this.base + "_mini" + this.extension
+data class UserImage(val base: String, val extension: String) : Serializable {
+    val original: String get() = this.base + this.extension
+    val bigger: String get() = this.base + "_bigger" + this.extension
+    val normal: String get() = this.base + "_normal" + this.extension
+    val mini: String get() = this.base + "_mini" + this.extension
 
     companion object {
         val PATTERN_NORMAL = Pattern.compile("(.+)_normal(\\..+|)")!!

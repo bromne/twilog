@@ -163,7 +163,7 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         mResult = result
         val pref = activity.sharedPreferences
         pref.history = pref.history.toBuilder()
-                .add(SavedQuery(this.mListener.query, DateTime.now()))
+                .add(SavedQuery(this.mListener.query, result.user, DateTime.now()))
                 .build()
 
         val icon: ImageView = mHeader.findViewById(R.id.icon)
@@ -186,12 +186,12 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         }).let { getString(it) }
 
         val sort = (if (mListener.query.order == TwilogClient.Order.ASC) R.string.ascending else R.string.descending).let { getString(it) }
-        val condition_text = mListener.query.body.map({
+        val conditionText = mListener.query.body.map({
             it?.toString(getString(R.string.date_format_with_day)) ?: getString(R.string.recent_tweets)
         }, {
             "\""+ it.keyword + "\""
         })
-        condition.text = getString(R.string.query_representation_format, condition_text, sort)
+        condition.text = getString(R.string.query_representation_format, conditionText, sort)
 
         val criteria: TwilogClient.Criteria? = mListener.query.body.map({ null }, { it })
         mHasNext = criteria != null

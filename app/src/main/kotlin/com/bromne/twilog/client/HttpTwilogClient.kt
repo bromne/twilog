@@ -16,9 +16,6 @@ import com.bromne.twilog.client.TwilogClient.Order
 import org.jsoup.Connection
 
 class HttpTwilogClient : TwilogClient {
-
-    internal val iconCache: MutableMap<String, Bitmap> = mutableMapOf()
-
     override fun find(query: TwilogClient.Query): Result {
         val base = "http://twilog.org/${query.userName}"
         val request = query.body.map({

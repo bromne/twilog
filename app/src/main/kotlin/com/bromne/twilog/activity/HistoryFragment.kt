@@ -5,29 +5,25 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.LruCache
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.bromne.stereotypes.app.layoutInflater
-import com.bromne.stereotypes.async.ParallelAsyncLoader
-import com.bromne.stereotypes.async.RegularAsyncTask
-import com.bromne.stereotypes.view.startAnimation
+import com.bromne.stereotypes.data.Either
 import com.bromne.twilog.R
 import com.bromne.twilog.app.SavedQuery
+import com.bromne.twilog.app.ViewExtensions.load
+import com.bromne.twilog.client.TwilogClient
+import com.bromne.twilog.client.User
 
 class HistoryFragment : Fragment() {
     lateinit var mModel: HistoryViewModel
-
-    val imageLoader: ParallelAsyncLoader<String, Bitmap> = ParallelAsyncLoader()
 
     lateinit var mListener: Listener
     lateinit var mList: RecyclerView
@@ -70,75 +66,98 @@ class HistoryFragment : Fragment() {
             fun findHistory(): List<SavedQuery>
         }
 
-        class HistoryAdapter(val fragment: HistoryFragment) : RecyclerView.Adapter<HistoryHolder>() {
+        class HistoryAdapter(val fragment: HistoryFragment) : RecyclerView.Adapter<ViewHolder>() {
             var items: List<SavedQuery> = emptyList()
                 set(value) {
                     field = value
                     notifyDataSetChanged()
                 }
 
-            internal val cache: LruCache<String, Bitmap> = LruCache(100)
+            override fun getItemCount() = this.items.size
 
-            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryHolder {
-                return HistoryHolder.of(parent, false)
+            override fun getItemViewType(position: Int): Int {
+                val body = items[position].query.body
+                if (body is Either.Left && body.value == null)
+                    return TYPE_USER
+                else
+                    return TYPE_QUERY
             }
 
-            override fun onBindViewHolder(holder: HistoryHolder, position: Int) {
+            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder = when (viewType) {
+                TYPE_USER -> ViewHolder.UserHolder.of(parent, false)
+                else -> ViewHolder.QueryHolder.of(parent, false)
+            }
+
+            override fun onBindViewHolder(holder: ViewHolder, position: Int) {
                 val item = this.items[position]
 
-                holder.setQuery(item)
-
-                val key = "default"
-                val restored = this.cache[key]
-                if (restored != null) {
-                    holder.icon.setImageBitmap(restored)
-                } else {
-                    this.fragment.imageLoader.loadOrRegister(key, object : RegularAsyncTask.Callbacks<Bitmap> {
-                        override fun onPreLoad() {
-                            holder.icon.tag = key
-                        }
-
-                        override fun loadInBackground(publishProgress: (Int) -> Unit): Bitmap {
-                            return BitmapFactory.decodeResource(this@HistoryAdapter.fragment.context!!.resources, R.drawable.designer_icon)
-                        }
-
-                        override fun onLoadFinished(result: Bitmap) {
-                            this@HistoryAdapter.cache.put(key, result)
-                            if (holder.icon.tag == key) {
-                                holder.icon.setImageBitmap(result)
-                                holder.icon.startAnimation(R.anim.fade_in_medium)
-                            }
-                        }
-
-                        override fun onException(e: Exception) {
-//                        holder.icon.setImageResource(R.drawable.designer_icon)
-//                        holder.icon.startAnimation(R.anim.fade_in_medium)
-                        }
-                    })
-                }
-                holder.icon
-            }
-
-            override fun getItemCount() = this.items.size
-        }
-
-        class HistoryHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-            val context: Context = itemView.context
-            val icon: ImageView = itemView.findViewById(R.id.icon)
-//            val displayName: TextView = itemView.findViewById(R.id.displayName)
-            val userName: TextView = itemView.findViewById(R.id.userName)
-
-            fun setQuery(query: SavedQuery): Unit {
-                this.userName.text = this.context.resources.getString(R.string.format_username, query.query.userName)
+                holder.setData(item.query, item.user)
             }
 
             companion object {
-                fun of(parent :ViewGroup, attachToRoot: Boolean): HistoryHolder {
-                    return parent.context.layoutInflater
-                            .inflate(R.layout.layout_saved_user, parent, attachToRoot)
-                            .let(::HistoryHolder)
+                val TYPE_USER = 1
+                val TYPE_QUERY = 2
+            }
+        }
+
+        sealed class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+            val context: Context = itemView.context
+            val icon: ImageView = itemView.findViewById(R.id.icon)
+            val userName: TextView = itemView.findViewById(R.id.userName)
+            val displayName: TextView = itemView.findViewById(R.id.displayName)
+
+            open fun setData(query: TwilogClient.Query, user: User) {
+                this.icon.load(user.image.bigger)
+                this.displayName.text = user.display
+                this.userName.text = String.format(context.getString(R.string.format_username), user.name)
+            }
+
+            class UserHolder(itemView: View) : ViewHolder(itemView) {
+                companion object {
+                    fun of(parent :ViewGroup, attachToRoot: Boolean): UserHolder {
+                        return parent.context.layoutInflater
+                                .inflate(R.layout.layout_saved_user, parent, attachToRoot)
+                                .let(::UserHolder)
+                    }
                 }
             }
+
+            class QueryHolder(itemView: View) : ViewHolder(itemView) {
+                val functionIcon: TextView = itemView.findViewById(R.id.function_icon)
+                val condition: TextView = itemView.findViewById(R.id.condition)
+
+                override fun setData(query: TwilogClient.Query, user: User) {
+                    super.setData(query, user)
+
+                    this.functionIcon.text = query.body.map({
+                        if (it != null)
+                            R.string.fontawesome_calendar
+                        else
+                            R.string.fontawesome_clock_o
+                    } , {
+                        R.string.fontawesome_search
+                    }).let { this.context.getString(it) }
+
+                    val sort = (if (query.order == TwilogClient.Order.ASC) R.string.ascending else R.string.descending)
+                            .let { this.context.getString(it) }
+                    val conditionText = query.body.map({
+                        it?.toString(this.context.getString(R.string.date_format_with_day)) ?: this.context.getString(R.string.recent_tweets)
+                    }, {
+                        "\""+ it.keyword + "\""
+                    })
+                    condition.text = this.context.getString(R.string.query_representation_format, conditionText, sort)
+                }
+
+                companion object {
+                    fun of(parent :ViewGroup, attachToRoot: Boolean): QueryHolder {
+                        return parent.context.layoutInflater
+                                .inflate(R.layout.layout_saved_query, parent, attachToRoot)
+                                .let(::QueryHolder)
+                    }
+                }
+            }
+
+
         }
     }
 }

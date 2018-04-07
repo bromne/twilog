@@ -7,6 +7,7 @@ import com.bromne.stereotypes.io.getSerializable
 import com.bromne.stereotypes.io.putSerializable
 import com.bromne.stereotypes.io.update
 import com.bromne.twilog.client.TwilogClient
+import com.bromne.twilog.client.User
 import com.google.common.collect.ImmutableSet
 import org.joda.time.DateTime
 import java.io.InvalidClassException
@@ -32,12 +33,10 @@ var SharedPreferences.history: ImmutableSet<SavedQuery>
     }
     set(value) = this.update { it.putSerializable(HISTORY, value) }
 
-data class SavedQuery(val query: TwilogClient.Query, val created: DateTime) : Serializable {
-    override fun equals(other: Any?): Boolean {
-        return when (other) {
-            is SavedQuery -> this.query == other.query
-            else -> false
-        }
+data class SavedQuery(val query: TwilogClient.Query, val user: User, val created: DateTime) : Serializable {
+    override fun equals(other: Any?): Boolean = when (other) {
+        is SavedQuery -> this.query == other.query
+        else -> false
     }
 
     override fun hashCode() = this.query.hashCode()

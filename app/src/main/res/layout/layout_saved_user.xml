@@ -28,7 +28,7 @@
 
         <TextView
             android:id="@+id/displayName"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_toEndOf="@id/icon"
             android:textAppearance="?android:attr/textAppearanceMedium"
@@ -38,10 +38,10 @@
 
         <TextView
             android:id="@+id/userName"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/margin_icon"
             android:layout_below="@id/displayName"
+            android:layout_marginEnd="@dimen/margin_icon"
             android:layout_toEndOf="@id/icon"
             android:textAppearance="?android:attr/textAppearanceSmall"
             tools:text="\@user" />
