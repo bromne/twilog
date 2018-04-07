@@ -25,6 +25,7 @@ import com.bromne.stereotypes.data.Either
 import com.bromne.stereotypes.data.toBuilder
 import com.bromne.stereotypes.view.startAnimation
 import com.bromne.twilog.R
+import com.bromne.twilog.activity.HistoryFragment.Companion.ViewHolder.QueryHolder
 import com.bromne.twilog.app.AppActivity.Companion.SearchStarting
 import com.bromne.twilog.app.SavedQuery
 import com.bromne.twilog.app.ViewExtensions.load
@@ -164,9 +165,11 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         mResult = result
         val pref = activity.sharedPreferences
         pref.history = pref.history.toBuilder()
-                .add(SavedQuery(this.mListener.query, result.user, DateTime.now()))
+                .add(SavedQuery(mListener.query, result.user, DateTime.now()))
                 .build()
 
+        val queryHolder = QueryHolder(mHeader)
+        queryHolder.setData(mListener.query, result.user)
         val icon: ImageView = mHeader.findViewById(R.id.icon)
         val displayName: TextView = mHeader.findViewById(R.id.displayName)
         val userName: TextView = mHeader.findViewById(R.id.userName)

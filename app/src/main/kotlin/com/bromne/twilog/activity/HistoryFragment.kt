@@ -11,6 +11,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.OnClickListener
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
@@ -91,8 +92,7 @@ class HistoryFragment : Fragment() {
 
             override fun onBindViewHolder(holder: ViewHolder, position: Int) {
                 val item = this.items[position]
-
-                holder.setData(item.query, item.user)
+                holder.setData(item.query, item.user, OnClickListener { fragment.mListener.openByQuery(item.query) })
             }
 
             companion object {
@@ -107,8 +107,9 @@ class HistoryFragment : Fragment() {
             val userName: TextView = itemView.findViewById(R.id.userName)
             val displayName: TextView = itemView.findViewById(R.id.displayName)
 
-            open fun setData(query: TwilogClient.Query, user: User) {
-                this.itemView.setOnClickListener({})
+            open fun setData(query: TwilogClient.Query, user: User, onClick: OnClickListener? = null) {
+                if (onClick!= null)
+                    this.itemView.setOnClickListener(onClick)
 
                 this.icon.load(user.image.bigger)
                 this.displayName.text = user.display
@@ -129,8 +130,8 @@ class HistoryFragment : Fragment() {
                 val functionIcon: TextView = itemView.findViewById(R.id.function_icon)
                 val condition: TextView = itemView.findViewById(R.id.condition)
 
-                override fun setData(query: TwilogClient.Query, user: User) {
-                    super.setData(query, user)
+                override fun setData(query: TwilogClient.Query, user: User, onClick: OnClickListener?) {
+                    super.setData(query, user, onClick)
 
                     this.functionIcon.text = query.body.map({
                         if (it != null)
