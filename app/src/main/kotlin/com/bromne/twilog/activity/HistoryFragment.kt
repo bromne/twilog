@@ -17,6 +17,7 @@ import android.widget.TextView
 import com.bromne.stereotypes.app.layoutInflater
 import com.bromne.stereotypes.data.Either
 import com.bromne.twilog.R
+import com.bromne.twilog.app.AppActivity.Companion.SearchStarting
 import com.bromne.twilog.app.SavedQuery
 import com.bromne.twilog.app.ViewExtensions.load
 import com.bromne.twilog.client.TwilogClient
@@ -25,12 +26,12 @@ import com.bromne.twilog.client.User
 class HistoryFragment : Fragment() {
     lateinit var mModel: HistoryViewModel
 
-    lateinit var mListener: Listener
+    lateinit var mListener: HistoryFragmentListener
     lateinit var mList: RecyclerView
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
-        mListener = context as Listener
+        mListener = context as HistoryFragmentListener
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -58,12 +59,12 @@ class HistoryFragment : Fragment() {
             return HistoryFragment()
         }
 
-        class HistoryViewModel : ViewModel() {
-            val queries: MutableLiveData<List<SavedQuery>> = MutableLiveData()
+        interface HistoryFragmentListener : SearchStarting {
+            fun findHistory(): List<SavedQuery>
         }
 
-        interface Listener {
-            fun findHistory(): List<SavedQuery>
+        class HistoryViewModel : ViewModel() {
+            val queries: MutableLiveData<List<SavedQuery>> = MutableLiveData()
         }
 
         class HistoryAdapter(val fragment: HistoryFragment) : RecyclerView.Adapter<ViewHolder>() {
@@ -107,6 +108,8 @@ class HistoryFragment : Fragment() {
             val displayName: TextView = itemView.findViewById(R.id.displayName)
 
             open fun setData(query: TwilogClient.Query, user: User) {
+                this.itemView.setOnClickListener({})
+
                 this.icon.load(user.image.bigger)
                 this.displayName.text = user.display
                 this.userName.text = String.format(context.getString(R.string.format_username), user.name)
@@ -156,8 +159,6 @@ class HistoryFragment : Fragment() {
                     }
                 }
             }
-
-
         }
     }
 }

@@ -25,6 +25,7 @@ import com.bromne.stereotypes.data.Either
 import com.bromne.stereotypes.data.toBuilder
 import com.bromne.stereotypes.view.startAnimation
 import com.bromne.twilog.R
+import com.bromne.twilog.app.AppActivity.Companion.SearchStarting
 import com.bromne.twilog.app.SavedQuery
 import com.bromne.twilog.app.ViewExtensions.load
 import com.bromne.twilog.app.history
@@ -39,7 +40,7 @@ import org.joda.time.LocalDate
 class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
     internal var mResult: Result? = null
 
-    lateinit internal var mListener: OnTweetFragmentInteractionListener
+    lateinit internal var mListener: TweetFragmentListener
 
     lateinit internal var mWrapper: View
     lateinit internal var mHeader: View
@@ -113,7 +114,7 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
-        mListener = context as OnTweetFragmentInteractionListener
+        mListener = context as TweetFragmentListener
     }
 
     override fun onDateSet(view: DatePicker, year: Int, month: Int, dayOfMonth: Int) {
@@ -329,12 +330,11 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             }
         }
 
-        interface OnTweetFragmentInteractionListener {
+        interface TweetFragmentListener : SearchStarting {
             var query: TwilogClient.Query
             var client: TwilogClient
 
             fun onOpenStatus(tweet: Tweet): Unit
-            fun openByQuery(query: TwilogClient.Query): Unit
         }
     }
 }

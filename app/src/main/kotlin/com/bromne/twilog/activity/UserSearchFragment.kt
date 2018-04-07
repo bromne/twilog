@@ -1,21 +1,22 @@
 package com.bromne.twilog.activity
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
-
+import com.bromne.stereotypes.data.Either
 import com.bromne.twilog.R
+import com.bromne.twilog.app.AppActivity.Companion.SearchStarting
+import com.bromne.twilog.client.TwilogClient.Query
+import com.bromne.twilog.client.TwilogClient.Order
 
 class UserSearchFragment : Fragment() {
-    internal lateinit var mListener: Listener
+    internal lateinit var mListener: UserSearchFragmentListener
 
     internal lateinit var mUserName: EditText
     internal lateinit var mMove: Button
@@ -39,20 +40,22 @@ class UserSearchFragment : Fragment() {
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
-        mListener = context as Listener
+        mListener = context as UserSearchFragmentListener
     }
 
     fun onMoveButtonSubmit(userName: String) {
         mListener.onMoveToUser(userName)
     }
 
-    interface Listener {
-        fun onMoveToUser(userName: String)
-    }
-
     companion object {
         fun newInstance(): UserSearchFragment {
             return UserSearchFragment()
+        }
+
+        interface UserSearchFragmentListener : SearchStarting {
+            fun onMoveToUser(userName: String) : Unit {
+                this.openByQuery(Query(userName, Either.left(null), Order.DESC))
+            }
         }
     }
 }

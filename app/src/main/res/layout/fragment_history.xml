@@ -16,9 +16,7 @@
         android:scrollbars="vertical"
         app:layoutManager="LinearLayoutManager"
         tools:context=".activity.HistoryFragment"
-        tools:listitem="@layout/layout_saved_user"
-        android:padding="@dimen/margin_card_half" />
-        <!--android:name="com.bromne.twilog.twilog.HistoryFragment"-->
+        tools:listitem="@layout/layout_saved_user" />
 
     <include
         android:layout_width="wrap_content"

@@ -6,8 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".activity.HomeActivity">
-
+    tools:context=".activity.HomeActivity" >
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar"
@@ -22,8 +21,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay"
-            app:elevation="@dimen/elevation_app_bar">
+            app:popupTheme="@style/AppTheme.PopupOverlay" >
 
         </android.support.v7.widget.Toolbar>
 
@@ -31,7 +29,6 @@
             android:id="@+id/tabs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:elevation="@dimen/elevation_app_bar"
             style="@style/AppTab" />
 
     </android.support.design.widget.AppBarLayout>

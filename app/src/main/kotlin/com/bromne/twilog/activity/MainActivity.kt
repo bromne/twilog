@@ -3,17 +3,15 @@ package com.bromne.twilog.activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.view.Menu
-import com.bromne.stereotypes.data.Either
 import com.bromne.twilog.R
+import com.bromne.twilog.app.AppActivity
 import com.bromne.twilog.client.HttpTwilogClient
 import com.bromne.twilog.client.Tweet
 import com.bromne.twilog.client.TwilogClient
 
-class MainActivity : AppCompatActivity(),
-        TweetFragment.Companion.OnTweetFragmentInteractionListener {
+class MainActivity : AppActivity(),
+        TweetFragment.Companion.TweetFragmentListener {
 
     lateinit override var query: TwilogClient.Query
 

@@ -5,19 +5,19 @@ import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentPagerAdapter
 import android.support.v4.view.ViewPager
-import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.bromne.stereotypes.data.Either
 import com.bromne.twilog.R
+import com.bromne.twilog.activity.HistoryFragment.Companion.HistoryFragmentListener
+import com.bromne.twilog.activity.UserSearchFragment.Companion.UserSearchFragmentListener
+import com.bromne.twilog.app.AppActivity
 import com.bromne.twilog.app.SavedQuery
 import com.bromne.twilog.app.history
 import com.bromne.twilog.app.sharedPreferences
-import com.bromne.twilog.client.TwilogClient
 
-class HomeActivity : AppCompatActivity(), UserSearchFragment.Listener, HistoryFragment.Companion.Listener {
+class HomeActivity : AppActivity(), UserSearchFragmentListener, HistoryFragmentListener {
     lateinit internal var mSectionsPagerAdapter: SectionsPagerAdapter
 
     lateinit internal var mViewPager: ViewPager
@@ -54,10 +54,6 @@ class HomeActivity : AppCompatActivity(), UserSearchFragment.Listener, HistoryFr
 
         val tabLayout: TabLayout = findViewById(R.id.tabs)
         tabLayout.setupWithViewPager(mViewPager)
-    }
-
-    override fun onMoveToUser(userName: String) {
-        MainActivity.Companion.start(this, TwilogClient.Query(userName, Either.left(null), TwilogClient.Order.DESC))
     }
 
     override fun findHistory(): List<SavedQuery> = this.sharedPreferences.history.toList()
