@@ -170,32 +170,6 @@ class TweetFragment : Fragment(), DatePickerDialog.OnDateSetListener {
 
         val queryHolder = QueryHolder(mHeader)
         queryHolder.setData(mListener.query, result.user)
-        val icon: ImageView = mHeader.findViewById(R.id.icon)
-        val displayName: TextView = mHeader.findViewById(R.id.displayName)
-        val userName: TextView = mHeader.findViewById(R.id.userName)
-        val functionIcon: TextView = mHeader.findViewById(R.id.function_icon)
-        val condition: TextView = mHeader.findViewById(R.id.condition)
-
-        icon.load(result.user.image.bigger)
-        displayName.text = result.user.display
-        userName.text = String.format(getString(R.string.format_username), result.user.name)
-
-        functionIcon.text = mListener.query.body.map({
-            if (it != null)
-                R.string.fontawesome_calendar
-            else
-                R.string.fontawesome_clock_o
-        } , {
-            R.string.fontawesome_search
-        }).let { getString(it) }
-
-        val sort = (if (mListener.query.order == TwilogClient.Order.ASC) R.string.ascending else R.string.descending).let { getString(it) }
-        val conditionText = mListener.query.body.map({
-            it?.toString(getString(R.string.date_format_with_day)) ?: getString(R.string.recent_tweets)
-        }, {
-            "\""+ it.keyword + "\""
-        })
-        condition.text = getString(R.string.query_representation_format, conditionText, sort)
 
         val criteria: TwilogClient.Criteria? = mListener.query.body.map({ null }, { it })
         mHasNext = criteria != null
