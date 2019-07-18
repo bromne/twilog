@@ -38,8 +38,8 @@
     <string name="button_search">Search</string>
     <string name="cancel">Cancel</string>
 
-    <string name="and">AND</string>
-    <string name="or">OR</string>
+    <string name="and" translatable="false">AND</string>
+    <string name="or" translatable="false">OR</string>
 
     <string name="query_representation_format">%1$s, %2$s</string>
 </resources>
