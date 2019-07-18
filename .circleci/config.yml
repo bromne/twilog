@@ -1,0 +1,21 @@
+# see: https://circleci.com/docs/2.0/language-android/
+version: 2
+jobs:
+  build:
+    working_directory: ~/twilog
+    docker:
+      - image: circleci/android:api-27
+    environment:
+      JVM_OPTS: -Xmx3200m
+    steps:
+      - checkout
+      - restore_cache:
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
+      - run:
+          command: ./gradlew androidDependencies
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
+      - run:
+          command: ./gradlew assembleRelease
